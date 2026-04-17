@@ -11,11 +11,12 @@ npm run build
 # Linting
 npm run lint
 
-# Run all tests
+# Run all tests (CI mode — exits after completion)
+npm test
 npm run test:run
 
-# Run tests in watch mode
-npm run test
+# Run tests in watch mode (development)
+npm run test:watch
 
 # Run tests with coverage
 npm run test:coverage
