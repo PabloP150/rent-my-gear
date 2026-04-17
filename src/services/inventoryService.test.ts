@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   getAllGear,
   getGearByCategory,
@@ -101,5 +101,19 @@ describe("searchGear", () => {
 
   it("returns empty array for no match", () => {
     expect(searchGear("xyznotexist")).toHaveLength(0);
+  });
+});
+
+describe("loadInventory — error path", () => {
+  it("throws with formatted message when inventory data is invalid", async () => {
+    vi.resetModules();
+    vi.doMock("@/data/inventory.json", () => ({
+      default: [{ id: 999, invalidField: true }],
+    }));
+
+    const { getAllGear } = await import("./inventoryService");
+    expect(() => getAllGear()).toThrow("[inventoryService] Invalid inventory data:");
+
+    vi.resetModules();
   });
 });

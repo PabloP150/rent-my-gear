@@ -1,8 +1,4 @@
 import inventoryData from "@/data/inventory.json";
-import fs from "fs";
-import path from "path";
-
-const INVENTORY_PATH = path.join(process.cwd(), "src/data/inventory.json");
 
 const NANO_BANANA_API_KEY = process.env.NANO_BANANA_API_KEY;
 
@@ -60,25 +56,6 @@ async function generateImageWithGemini(gearName: string): Promise<string> {
 }
 
 /**
- * Persists a generated data URL back to inventory.json so subsequent server-side
- * calls skip regeneration. Data URLs are large; in production swap for GCS URL.
- */
-function persistImageUrl(gearId: string, imageURL: string): void {
-  // Skip persisting data URLs to avoid bloating inventory.json
-  if (imageURL.startsWith("data:")) return;
-  try {
-    const inventory = JSON.parse(fs.readFileSync(INVENTORY_PATH, "utf-8"));
-    const item = inventory.find((i: { id: string }) => i.id === gearId);
-    if (item) {
-      item.imageURL = imageURL;
-      fs.writeFileSync(INVENTORY_PATH, JSON.stringify(inventory, null, 2));
-    }
-  } catch (err) {
-    console.error("[imageService] Failed to persist imageURL to inventory.json:", err);
-  }
-}
-
-/**
  * Resolves the image URL for a gear item.
  *
  * Strategy:
@@ -98,8 +75,6 @@ export async function resolveImageUrl(gearId: string, gearName: string): Promise
   console.log(`[imageService] No imageURL for "${gearName}" (${gearId}). Generating via Gemini...`);
 
   const dataUrl = await generateImageWithGemini(gearName);
-
-  persistImageUrl(gearId, dataUrl);
   console.log(`[imageService] Generated image for: ${gearId}`);
 
   return dataUrl;

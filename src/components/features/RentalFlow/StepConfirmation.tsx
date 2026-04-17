@@ -24,7 +24,7 @@ export function StepConfirmation({ state }: StepConfirmationProps) {
 
   const breakdown =
     state.startDate && state.endDate
-      ? calculatePrice(state.gear.dailyRate, { from: state.startDate, to: state.endDate })
+      ? calculatePrice(state.gear.dailyRate, { from: state.startDate, to: state.endDate }, state.gear.category)
       : null;
 
   async function handleConfirm() {
@@ -124,6 +124,21 @@ export function StepConfirmation({ state }: StepConfirmationProps) {
 
         {breakdown && (
           <>
+            <Separator />
+            <div className="space-y-1 text-sm">
+              <div className="flex justify-between text-neutral-500">
+                <span>Subtotal ({breakdown.days} día{breakdown.days !== 1 ? "s" : ""})</span>
+                <span>{formatCurrency(breakdown.subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-neutral-500">
+                <span>Seguro Smart ({Math.round(breakdown.insuranceRate * 100)}%)</span>
+                <span>{formatCurrency(breakdown.insurance)}</span>
+              </div>
+              <div className="flex justify-between text-neutral-500">
+                <span>IVA (12%)</span>
+                <span>{formatCurrency(breakdown.tax)}</span>
+              </div>
+            </div>
             <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total a pagar</span>

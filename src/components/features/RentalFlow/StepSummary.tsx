@@ -22,7 +22,7 @@ export function StepSummary({ state, onUpdate, onNext, onBack }: StepSummaryProp
 
   const breakdown =
     state.startDate && state.endDate
-      ? calculatePrice(state.gear.dailyRate, { from: state.startDate, to: state.endDate })
+      ? calculatePrice(state.gear.dailyRate, { from: state.startDate, to: state.endDate }, state.gear.category)
       : null;
 
   function validate(): boolean {
@@ -76,6 +76,12 @@ export function StepSummary({ state, onUpdate, onNext, onBack }: StepSummaryProp
                 {breakdown.days !== 1 ? "s" : ""}
               </span>
               <span>{formatCurrency(breakdown.subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-neutral-500">
+                Seguro Smart ({Math.round(breakdown.insuranceRate * 100)}%)
+              </span>
+              <span>{formatCurrency(breakdown.insurance)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-neutral-500">IVA (12%)</span>

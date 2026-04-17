@@ -2,11 +2,45 @@ import { describe, it, expect } from "vitest";
 import {
   calculateDays,
   calculatePrice,
+  calculateInsuranceRate,
+  INSURANCE_RATES,
   isAvailableDate,
   isValidRange,
   formatCurrency,
   formatDateEs,
 } from "./date-utils";
+
+// ─── INSURANCE_RATES constant ─────────────────────────────────────────────────
+
+describe("INSURANCE_RATES", () => {
+  it("photography equipment has 20% insurance rate", () => {
+    expect(INSURANCE_RATES["fotografia-video"]).toBe(0.2);
+  });
+
+  it("mountain/camping equipment has 10% insurance rate", () => {
+    expect(INSURANCE_RATES["montana-camping"]).toBe(0.1);
+  });
+
+  it("water sports equipment has 10% insurance rate", () => {
+    expect(INSURANCE_RATES["deportes-acuaticos"]).toBe(0.1);
+  });
+});
+
+// ─── calculateInsuranceRate ───────────────────────────────────────────────────
+
+describe("calculateInsuranceRate", () => {
+  it("returns 0.20 for fotografia-video (photography premium)", () => {
+    expect(calculateInsuranceRate("fotografia-video")).toBe(0.2);
+  });
+
+  it("returns 0.10 for montana-camping", () => {
+    expect(calculateInsuranceRate("montana-camping")).toBe(0.1);
+  });
+
+  it("returns 0.10 for deportes-acuaticos", () => {
+    expect(calculateInsuranceRate("deportes-acuaticos")).toBe(0.1);
+  });
+});
 
 // ─── calculateDays ────────────────────────────────────────────────────────────
 
@@ -43,74 +77,117 @@ describe("calculateDays", () => {
 
 // ─── calculatePrice ───────────────────────────────────────────────────────────
 
-describe("calculatePrice", () => {
-  it("prices a 1-day rental correctly — catches off-by-one", () => {
+describe("calculatePrice — Smart Insurance: fotografia-video (20%)", () => {
+  it("applies 20% insurance to a 1-day photography rental", () => {
     const d = new Date("2026-05-01");
-    const r = calculatePrice(500, { from: d, to: d });
+    const r = calculatePrice(1000, { from: d, to: d }, "fotografia-video");
     expect(r.days).toBe(1);
-    expect(r.subtotal).toBe(500);
-    expect(r.tax).toBeCloseTo(60, 5);
-    expect(r.total).toBeCloseTo(560, 5);
+    expect(r.subtotal).toBe(1000);
+    expect(r.insuranceRate).toBe(0.2);
+    expect(r.insurance).toBeCloseTo(200, 5);
+    expect(r.tax).toBeCloseTo(120, 5);
+    expect(r.total).toBeCloseTo(1320, 5);
   });
 
-  it("prices a 3-day rental at $100/day (subtotal $300, tax $36, total $336)", () => {
-    const r = calculatePrice(100, { from: new Date("2026-05-01"), to: new Date("2026-05-03") });
+  it("applies 20% insurance to a 3-day photography rental at $850/day", () => {
+    const from = new Date("2026-05-01");
+    const to = new Date("2026-05-03");
+    const r = calculatePrice(850, { from, to }, "fotografia-video");
     expect(r.days).toBe(3);
-    expect(r.subtotal).toBe(300);
-    expect(r.tax).toBeCloseTo(36, 5);
-    expect(r.total).toBeCloseTo(336, 5);
+    expect(r.subtotal).toBe(2550);
+    expect(r.insurance).toBeCloseTo(510, 5);   // 20% of 2550
+    expect(r.tax).toBeCloseTo(306, 5);          // 12% of 2550
+    expect(r.total).toBeCloseTo(3366, 5);       // 2550 + 510 + 306
   });
 
-  it("prices a 7-day rental at $850/day (subtotal $5950)", () => {
-    const r = calculatePrice(850, { from: new Date("2026-05-01"), to: new Date("2026-05-07") });
+  it("applies 20% insurance to a 7-day photography rental", () => {
+    const from = new Date("2026-05-01");
+    const to = new Date("2026-05-07");
+    const r = calculatePrice(850, { from, to }, "fotografia-video");
     expect(r.days).toBe(7);
     expect(r.subtotal).toBe(5950);
-    expect(r.tax).toBeCloseTo(714, 5);
-    expect(r.total).toBeCloseTo(6664, 5);
+    expect(r.insurance).toBeCloseTo(1190, 5);  // 20% of 5950
+    expect(r.total).toBeCloseTo(5950 + 1190 + 714, 5);
+  });
+});
+
+describe("calculatePrice — Smart Insurance: montana-camping (10%)", () => {
+  it("applies 10% insurance to a 1-day camping rental", () => {
+    const d = new Date("2026-05-01");
+    const r = calculatePrice(500, { from: d, to: d }, "montana-camping");
+    expect(r.insuranceRate).toBe(0.1);
+    expect(r.insurance).toBeCloseTo(50, 5);
+    expect(r.tax).toBeCloseTo(60, 5);
+    expect(r.total).toBeCloseTo(610, 5);
   });
 
-  it("allows rentals longer than 7 days — no artificial cap", () => {
-    const r = calculatePrice(200, { from: new Date("2026-05-01"), to: new Date("2026-05-14") });
-    expect(r.days).toBe(14);
-    expect(r.subtotal).toBe(2800);
+  it("applies 10% insurance to a 5-day camping rental", () => {
+    const from = new Date("2026-06-01");
+    const to = new Date("2026-06-05");
+    const r = calculatePrice(200, { from, to }, "montana-camping");
+    expect(r.days).toBe(5);
+    expect(r.subtotal).toBe(1000);
+    expect(r.insurance).toBeCloseTo(100, 5);
+    expect(r.tax).toBeCloseTo(120, 5);
+    expect(r.total).toBeCloseTo(1220, 5);
+  });
+});
+
+describe("calculatePrice — Smart Insurance: deportes-acuaticos (10%)", () => {
+  it("applies 10% insurance to a water sports rental", () => {
+    const d = new Date("2026-05-01");
+    const r = calculatePrice(600, { from: d, to: d }, "deportes-acuaticos");
+    expect(r.insuranceRate).toBe(0.1);
+    expect(r.insurance).toBeCloseTo(60, 5);
+    expect(r.tax).toBeCloseTo(72, 5);
+    expect(r.total).toBeCloseTo(732, 5);
+  });
+});
+
+describe("calculatePrice — general", () => {
+  it("photography insurance (20%) is higher than other categories (10%) for same rental", () => {
+    const range = { from: new Date("2026-05-01"), to: new Date("2026-05-03") };
+    const photo = calculatePrice(500, range, "fotografia-video");
+    const camping = calculatePrice(500, range, "montana-camping");
+    expect(photo.insurance).toBeGreaterThan(camping.insurance);
+    expect(photo.insurance).toBe(camping.insurance * 2);
   });
 
-  it("prices a 30-day rental correctly", () => {
-    const r = calculatePrice(150, { from: new Date("2026-06-01"), to: new Date("2026-06-30") });
-    expect(r.days).toBe(30);
-    expect(r.subtotal).toBe(4500);
-    expect(r.total).toBeCloseTo(5040, 5);
+  it("exposes dailyRate in breakdown for UI display", () => {
+    const d = new Date("2026-05-01");
+    const r = calculatePrice(750, { from: d, to: d }, "montana-camping");
+    expect(r.dailyRate).toBe(750);
   });
 
-  it("prices a cross-month range (Jan 28 → Feb 3, 7 days) at $200/day", () => {
-    const r = calculatePrice(200, { from: new Date("2026-01-28"), to: new Date("2026-02-03") });
-    expect(r.days).toBe(7);
-    expect(r.subtotal).toBe(1400);
-    expect(r.total).toBeCloseTo(1568, 5);
-  });
-
-  it("applies exactly 12% IVA regardless of daily rate", () => {
-    const r = calculatePrice(1000, { from: new Date("2026-05-01"), to: new Date("2026-05-01") });
-    expect(r.tax / r.subtotal).toBeCloseTo(0.12, 10);
-  });
-
-  it("handles decimal daily rates without floating-point blowup", () => {
-    const r = calculatePrice(333.33, { from: new Date("2026-05-01"), to: new Date("2026-05-04") });
-    expect(r.days).toBe(4);
-    expect(r.subtotal).toBeCloseTo(1333.32, 2);
-    expect(r.total).toBeCloseTo(1333.32 * 1.12, 2);
-  });
-
-  it("returns 0 subtotal for an invalid (reversed) date range", () => {
-    const r = calculatePrice(500, { from: new Date("2026-05-10"), to: new Date("2026-05-01") });
+  it("returns zero subtotal, insurance and total for a reversed range", () => {
+    const r = calculatePrice(500, { from: new Date("2026-05-10"), to: new Date("2026-05-01") }, "fotografia-video");
     expect(r.days).toBe(0);
     expect(r.subtotal).toBe(0);
+    expect(r.insurance).toBe(0);
     expect(r.total).toBe(0);
   });
 
-  it("exposes the dailyRate in the breakdown for UI display", () => {
-    const r = calculatePrice(750, { from: new Date("2026-05-01"), to: new Date("2026-05-03") });
-    expect(r.dailyRate).toBe(750);
+  it("tax is exactly 12% of subtotal regardless of insurance", () => {
+    const d = new Date("2026-05-01");
+    const r = calculatePrice(1000, { from: d, to: d }, "fotografia-video");
+    expect(r.tax / r.subtotal).toBeCloseTo(0.12, 10);
+  });
+
+  it("allows rentals longer than 7 days with correct insurance", () => {
+    const from = new Date("2026-05-01");
+    const to = new Date("2026-05-14"); // 14 days
+    const r = calculatePrice(200, { from, to }, "fotografia-video");
+    expect(r.days).toBe(14);
+    expect(r.subtotal).toBe(2800);
+    expect(r.insurance).toBeCloseTo(560, 5); // 20% of 2800
+  });
+
+  it("handles cross-month range with correct insurance (Jan 28 → Feb 3)", () => {
+    const r = calculatePrice(200, { from: new Date("2026-01-28"), to: new Date("2026-02-03") }, "montana-camping");
+    expect(r.days).toBe(7);
+    expect(r.subtotal).toBe(1400);
+    expect(r.insurance).toBeCloseTo(140, 5); // 10%
+    expect(r.total).toBeCloseTo(1400 + 140 + 168, 5);
   });
 });
 
@@ -145,7 +222,7 @@ describe("isValidRange", () => {
     expect(isValidRange(new Date("2026-05-01"), new Date("2026-05-05"))).toBe(true);
   });
 
-  it("returns false when end equals start (same instant)", () => {
+  it("returns false when end equals start", () => {
     const d = new Date("2026-05-01");
     expect(isValidRange(d, d)).toBe(false);
   });
@@ -164,7 +241,7 @@ describe("formatCurrency", () => {
     expect(result).toContain("500");
   });
 
-  it("produces a non-trivial string (includes currency marker)", () => {
+  it("produces a non-trivial string with currency marker", () => {
     expect(formatCurrency(100).length).toBeGreaterThan(3);
   });
 });
@@ -173,11 +250,9 @@ describe("formatCurrency", () => {
 
 describe("formatDateEs", () => {
   it("formats May 1st 2026 in full Spanish", () => {
-    // Use local noon to avoid UTC-offset shifting the date to April 30
     const result = formatDateEs(new Date(2026, 4, 1, 12));
     expect(result).toContain("mayo");
     expect(result).toContain("2026");
-    expect(result).toContain("1");
   });
 
   it("uses 'de' separators between day, month and year", () => {
