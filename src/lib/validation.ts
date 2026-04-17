@@ -2,11 +2,15 @@ import { z } from "zod";
 
 // ─── Inventory / Gear ────────────────────────────────────────────────────────
 
-export const categorySchema = z.enum([
+export const CATEGORY_IDS = [
   "fotografia-video",
   "montana-camping",
   "deportes-acuaticos",
-]);
+] as const;
+
+export type CategoryId = (typeof CATEGORY_IDS)[number];
+
+export const categorySchema = z.enum(CATEGORY_IDS);
 
 export type Category = z.infer<typeof categorySchema>;
 
@@ -14,6 +18,21 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   "fotografia-video": "Fotografía y Video",
   "montana-camping": "Montaña y Camping",
   "deportes-acuaticos": "Deportes Acuáticos",
+};
+
+export const CATEGORIES: Record<CategoryId, { name: string; description: string }> = {
+  "fotografia-video": {
+    name: "Fotografía y Video",
+    description: "Cámaras, lentes, iluminación y equipo audiovisual profesional",
+  },
+  "montana-camping": {
+    name: "Montaña y Camping",
+    description: "Tiendas, mochilas, equipo técnico de montaña y accesorios de camping",
+  },
+  "deportes-acuaticos": {
+    name: "Deportes Acuáticos",
+    description: "Kayaks, SUP, equipo de buceo, surf y deportes náuticos",
+  },
 };
 
 export const gearItemSchema = z.object({
