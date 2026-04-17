@@ -1,165 +1,49 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { GearItem, CategoryId, validateGearItem, isValidCategory } from "@/lib/validation";
+import inventoryData from "@/data/inventory.json";
+import { gearItemSchema, type GearItem, type CategoryId } from "@/lib/validation";
 
-// Path to the inventory JSON file
-const INVENTORY_PATH = path.join(process.cwd(), "src", "data", "inventory.json");
+let cache: { items: GearItem[]; expiresAt: number } | null = null;
+const TTL_MS = 5 * 60 * 1000;
 
-// In-memory cache for inventory
-let inventoryCache: GearItem[] | null = null;
-
-/**
- * Load inventory from JSON file
- * Uses caching to avoid repeated file reads
- */
-export async function loadInventory(): Promise<GearItem[]> {
-  if (inventoryCache !== null) {
-    return inventoryCache;
-  }
-
-  try {
-    const data = await fs.readFile(INVENTORY_PATH, "utf-8");
-    const rawItems = JSON.parse(data);
-
-    // Validate each item
-    const items: GearItem[] = rawItems.map((item: unknown) => validateGearItem(item));
-
-    inventoryCache = items;
-    return items;
-  } catch (error) {
-    console.error("Failed to load inventory:", error);
-    throw new Error("Could not load inventory data");
-  }
+function loadAll(): GearItem[] {
+  const now = Date.now();
+  if (cache && cache.expiresAt > now) return cache.items;
+  const parsed = gearItemSchema.array().parse(inventoryData);
+  cache = { items: parsed, expiresAt: now + TTL_MS };
+  return parsed;
 }
 
-/**
- * Save inventory to JSON file
- * Used when AI generates new images
- */
-export async function saveInventory(items: GearItem[]): Promise<void> {
-  try {
-    const data = JSON.stringify(items, null, 2);
-    await fs.writeFile(INVENTORY_PATH, data, "utf-8");
-    inventoryCache = items;
-  } catch (error) {
-    console.error("Failed to save inventory:", error);
-    throw new Error("Could not save inventory data");
-  }
+export function getAllGear(): GearItem[] {
+  return loadAll();
 }
 
-/**
- * Get all gear items
- */
-export async function getAllGear(): Promise<GearItem[]> {
-  return loadInventory();
+export function getGearById(id: string): GearItem | null {
+  return loadAll().find((i) => i.id === id) ?? null;
 }
 
-/**
- * Get gear items by category
- */
-export async function getGearByCategory(categoryId: string): Promise<GearItem[]> {
-  if (!isValidCategory(categoryId)) {
-    throw new Error(`Invalid category: ${categoryId}`);
-  }
-
-  const items = await loadInventory();
-  return items.filter((item) => item.category === categoryId);
+export function getGearByCategory(category: CategoryId): GearItem[] {
+  return loadAll().filter((i) => i.category === category);
 }
 
-/**
- * Get a single gear item by ID
- */
-export async function getGearById(id: string): Promise<GearItem | null> {
-  const items = await loadInventory();
-  return items.find((item) => item.id === id) || null;
-}
-
-/**
- * Get random gear items for the carousel
- */
-export async function getRandomGear(count: number = 5): Promise<GearItem[]> {
-  const items = await loadInventory();
-
-  // Fisher-Yates shuffle
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i--) {
+function shuffle<T>(arr: readonly T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-
-  return shuffled.slice(0, count);
+  return a;
 }
 
-/**
- * Search gear items by name or description
- */
-export async function searchGear(query: string): Promise<GearItem[]> {
-  const items = await loadInventory();
-  const lowerQuery = query.toLowerCase().trim();
+export function getRandomGear(count: number): GearItem[] {
+  return shuffle(loadAll()).slice(0, count);
+}
 
-  if (!lowerQuery) return items;
-
-  return items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(lowerQuery) ||
-      item.description.toLowerCase().includes(lowerQuery)
+export function searchGear(category: CategoryId, query: string): GearItem[] {
+  const q = query.trim().toLowerCase();
+  const byCat = getGearByCategory(category);
+  if (!q) return byCat;
+  return byCat.filter(
+    (i) =>
+      i.name.toLowerCase().includes(q) ||
+      i.description.toLowerCase().includes(q)
   );
-}
-
-/**
- * Get gear items that need image generation (no imageURL)
- */
-export async function getGearWithoutImages(): Promise<GearItem[]> {
-  const items = await loadInventory();
-  return items.filter((item) => !item.imageURL);
-}
-
-/**
- * Update a gear item's imageURL
- * Used after AI image generation
- */
-export async function updateGearImage(gearId: string, imageURL: string): Promise<GearItem | null> {
-  const items = await loadInventory();
-  const index = items.findIndex((item) => item.id === gearId);
-
-  if (index === -1) return null;
-
-  items[index] = { ...items[index], imageURL };
-  await saveInventory(items);
-
-  return items[index];
-}
-
-/**
- * Get category statistics
- */
-export async function getCategoryStats(): Promise<
-  Record<CategoryId, { count: number; withImages: number; withoutImages: number }>
-> {
-  const items = await loadInventory();
-
-  const stats: Record<CategoryId, { count: number; withImages: number; withoutImages: number }> = {
-    "fotografia-video": { count: 0, withImages: 0, withoutImages: 0 },
-    "montana-camping": { count: 0, withImages: 0, withoutImages: 0 },
-    "deportes-acuaticos": { count: 0, withImages: 0, withoutImages: 0 },
-  };
-
-  for (const item of items) {
-    stats[item.category].count++;
-    if (item.imageURL) {
-      stats[item.category].withImages++;
-    } else {
-      stats[item.category].withoutImages++;
-    }
-  }
-
-  return stats;
-}
-
-/**
- * Clear the inventory cache
- * Useful for development/testing
- */
-export function clearInventoryCache(): void {
-  inventoryCache = null;
 }
