@@ -2,20 +2,53 @@
 
 Premium equipment rental marketplace for photography, mountaineering, and water sports gear.
 
+## Smart Insurance
+
+Every rental includes **Smart Insurance** — automatically calculated based on gear category:
+
+| Category | Insurance Rate |
+|---|---|
+| `fotografia-video` | **20%** of subtotal |
+| `montana-camping` | **10%** of subtotal |
+| `deportes-acuaticos` | **10%** of subtotal |
+
+### Calculation flow
+
+```mermaid
+flowchart TD
+    A[dailyRate × days] --> B[subtotal]
+    B --> C{category?}
+    C -->|fotografia-video| D[insuranceRate = 0.20]
+    C -->|montana-camping| E[insuranceRate = 0.10]
+    C -->|deportes-acuaticos| F[insuranceRate = 0.10]
+    D --> G[insurance = subtotal × insuranceRate]
+    E --> G
+    F --> G
+    B --> H[tax = subtotal × 0.12 IVA]
+    G --> I[total = subtotal + insurance + tax]
+    H --> I
+```
+
+See [docs/smart-insurance.md](docs/smart-insurance.md) for full details and example breakdowns.
+
+---
+
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [docs/smart-insurance.md](docs/smart-insurance.md) | Smart Insurance rates, Mermaid calculation diagram, PriceBreakdown interface |
 | [docs/architecture.md](docs/architecture.md) | System overview, layered architecture, data model, request lifecycle, caching, error boundaries |
 | [docs/image-resolution.md](docs/image-resolution.md) | Mermaid sequence diagrams for the full image resolution flow (JSON → Nano Banana → GCS) |
 | [docs/services.md](docs/services.md) | Mermaid class diagram for `inventoryService` and `imageService`; full API reference for all service methods |
 | [docs/onboarding.md](docs/onboarding.md) | New developer guide: mental models, key patterns, debugging GCS, adding a new category |
-| [docs/test-results.md](docs/test-results.md) | Full test run report: 80 tests across 6 files, bug regression table, edge case findings |
+| [docs/test-results.md](docs/test-results.md) | Full test run report: 91 tests across 6 files, 100% coverage on core business logic |
 
 ---
 
 ## Features
 
+- **Smart Insurance** — Automatic per-category insurance fee (20% photography, 10% others)
 - **Hero Carousel** — 5 random featured items with auto-play
 - **Category browsing** — Fotografía y Video, Montaña y Camping, Deportes Acuáticos
 - **Real-time search** — Filter gear within any category
