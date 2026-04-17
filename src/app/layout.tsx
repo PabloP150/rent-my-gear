@@ -1,44 +1,78 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Rent My Gear — Renta de Equipo Premium",
+  title: "Rent my Gear | Alquiler de Equipo Premium",
   description:
-    "Renta cámaras, equipo de montaña y deportes acuáticos de alta calidad al mejor precio.",
+    "Marketplace de alquiler de equipo profesional para fotografía, montaña y deportes acuáticos.",
+  keywords: [
+    "alquiler equipo",
+    "renta cámaras",
+    "equipo fotografía",
+    "camping",
+    "deportes acuáticos",
+  ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-white">
-        <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="text-xl font-bold tracking-tight text-neutral-900">
-              Rent My Gear
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
+      >
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto flex h-16 items-center px-4">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-xl font-bold tracking-tight">
+                Rent my Gear
+              </span>
             </Link>
-            <nav className="flex items-center gap-6 text-sm font-medium text-neutral-600">
-              <Link href="/category/fotografia-video" className="hover:text-neutral-900 transition-colors">
+            <nav className="ml-auto flex items-center gap-6">
+              <Link
+                href="/category/fotografia-video"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Fotografía
               </Link>
-              <Link href="/category/montana-camping" className="hover:text-neutral-900 transition-colors">
+              <Link
+                href="/category/montana-camping"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Montaña
               </Link>
-              <Link href="/category/deportes-acuaticos" className="hover:text-neutral-900 transition-colors">
-                Acuático
+              <Link
+                href="/category/deportes-acuaticos"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Acuáticos
               </Link>
             </nav>
           </div>
         </header>
-
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
-
-        <footer className="border-t border-neutral-200 bg-neutral-50 py-8 text-center text-sm text-neutral-400">
-          © {new Date().getFullYear()} Rent My Gear. Todos los derechos reservados.
+        <main className="flex-1">{children}</main>
+        <footer className="border-t py-8 mt-12">
+          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Rent my Gear. Todos los derechos reservados.</p>
+          </div>
         </footer>
-
-        <Toaster />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

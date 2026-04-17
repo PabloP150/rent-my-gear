@@ -1,9 +1,13 @@
 [project]
 name = "rent-my-gear-scripts"
 version = "0.1.0"
-requires-python = ">=3.11"
+description = "Scripts for Rent my Gear application"
+requires-python = ">=3.10"
 dependencies = [
-    "google-cloud-storage>=2.18.0",
     "python-dotenv>=1.0.0",
-    "requests>=2.32.0",
+    "google-cloud-storage>=2.14.0",
+    "requests>=2.31.0",
 ]
+
+[tool.uv]
+dev-dependencies = []

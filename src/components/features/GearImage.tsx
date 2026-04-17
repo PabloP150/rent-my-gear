@@ -1,94 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { Camera } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface GearImageProps {
-  src?: string | null;
-  alt: string;
   gearId: string;
-  className?: string;
-  priority?: boolean;
+  gearName: string;
+  initialImageURL: string | null;
 }
 
-export function GearImage({ src, alt, gearId, className, priority = false }: GearImageProps) {
-  const [imgSrc, setImgSrc] = useState<string | null>(src ?? null);
-  const [loading, setLoading] = useState(!src);
-  const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState(false);
+export function GearImage({ gearId, gearName, initialImageURL }: GearImageProps) {
+  const [imageURL, setImageURL] = useState<string | null>(initialImageURL);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (!src && !generating && !error) {
-      setGenerating(true);
-      setLoading(true);
-      fetch(`/api/generate-image?gearId=${gearId}`)
-        .then((r) => r.json())
-        .then((data: { imageURL?: string }) => {
-          if (data.imageURL) {
-            setImgSrc(data.imageURL);
-          } else {
-            setError(true);
-          }
-        })
-        .catch(() => setError(true))
-        .finally(() => {
-          setGenerating(false);
-          setLoading(false);
+  useEffect(() => {
+    // Only trigger generation if there's no image
+    if (initialImageURL) return;
+
+    const generateImage = async () => {
+      setIsGenerating(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/generate-image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ gearId }),
         });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gearId, src]);
 
-  if (error || (!imgSrc && !loading)) {
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-center bg-neutral-100 text-neutral-400",
-          className
-        )}
-      >
-        <Camera className="h-12 w-12 opacity-30" />
-      </div>
-    );
-  }
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Failed to generate image");
+        }
 
-  if (loading || !imgSrc) {
+        const data = await response.json();
+        setImageURL(data.imageURL);
+      } catch (err) {
+        console.error("Image generation failed:", err);
+        setError(err instanceof Error ? err.message : "Error generating image");
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+
+    generateImage();
+  }, [gearId, initialImageURL]);
+
+  // Show loading spinner while generating
+  if (isGenerating) {
     return (
-      <div className={cn("animate-pulse bg-neutral-200", className)}>
-        {generating && (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-xs text-neutral-400">Generando imagen…</span>
+      <div className="absolute inset-0 flex items-center justify-center bg-neutral-50">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
+          <div className="space-y-1">
+            <p className="font-medium text-neutral-700">Generando imagen con IA...</p>
+            <p className="text-sm text-muted-foreground">
+              Esto puede tomar unos segundos
+            </p>
           </div>
-        )}
+        </div>
       </div>
     );
   }
 
-  const isDataUrl = imgSrc.startsWith("data:");
+  // Show error state
+  if (error && !imageURL) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+            <span className="text-4xl">⚠️</span>
+          </div>
+          <p className="text-muted-foreground">No se pudo generar la imagen</p>
+          <p className="text-sm text-red-500 mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
+  // Show image if available
+  if (imageURL) {
+    return (
+      <Image
+        src={imageURL}
+        alt={gearName}
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 50vw"
+        priority
+      />
+    );
+  }
+
+  // Fallback: No image available
   return (
-    <div className={cn("relative overflow-hidden", className)}>
-      {isDataUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={imgSrc}
-          alt={alt}
-          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-          onError={() => setError(true)}
-        />
-      ) : (
-        <Image
-          src={imgSrc}
-          alt={alt}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-300 hover:scale-105"
-          priority={priority}
-          onError={() => setError(true)}
-        />
-      )}
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-neutral-200 flex items-center justify-center">
+          <span className="text-4xl">📷</span>
+        </div>
+        <p className="text-muted-foreground">Imagen no disponible</p>
+      </div>
     </div>
   );
 }

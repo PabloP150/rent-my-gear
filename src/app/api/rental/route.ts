@@ -1,54 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rentalRequestRefinedSchema } from "@/lib/validation";
+import { z } from "zod";
 import { getGearById } from "@/services/inventoryService";
-import { randomUUID } from "crypto";
+import { calculateRentalPrice, formatPrice } from "@/lib/date-utils";
 
-export async function POST(req: NextRequest) {
-  let body: unknown;
+// Request schema
+const rentalRequestSchema = z.object({
+  gearId: z.string().min(1),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+});
+
+// Mock rental ID generator
+function generateRentalId(): string {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `RMG-${timestamp}-${random}`;
+}
+
+export async function POST(request: NextRequest) {
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Cuerpo de la solicitud inválido." }, { status: 400 });
-  }
+    const body = await request.json();
 
-  const result = rentalRequestRefinedSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      { error: result.error.issues[0].message, details: result.error.issues },
-      { status: 422 }
-    );
-  }
+    // Validate request
+    const validation = rentalRequestSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid request",
+          details: validation.error.issues,
+        },
+        { status: 400 }
+      );
+    }
 
-  const { gearId, startDate, endDate, customerName, customerEmail } = result.data;
+    const { gearId, startDate, endDate } = validation.data;
 
-  const gear = getGearById(gearId);
-  if (!gear) {
-    return NextResponse.json({ error: "Equipo no encontrado." }, { status: 404 });
-  }
-  if (!gear.available) {
-    return NextResponse.json({ error: "El equipo no está disponible." }, { status: 409 });
-  }
+    // Get gear item
+    const item = await getGearById(gearId);
+    if (!item) {
+      return NextResponse.json(
+        { error: "Gear item not found" },
+        { status: 404 }
+      );
+    }
 
-  // Mock rental confirmation — replace with database write in production
-  const rentalId = `RMG-${randomUUID().slice(0, 8).toUpperCase()}`;
+    // Calculate pricing
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const pricing = calculateRentalPrice(item.dailyRate, start, end);
 
-  console.log("[POST /api/rental] Created rental:", {
-    rentalId,
-    gearId,
-    startDate,
-    endDate,
-    customerName,
-    customerEmail,
-  });
-
-  return NextResponse.json(
-    {
-      rentalId,
-      message: "Renta confirmada exitosamente.",
-      gear: { id: gear.id, name: gear.name },
+    // Generate confirmation
+    const confirmation = {
+      id: generateRentalId(),
+      gearId: item.id,
+      gearName: item.name,
       startDate,
       endDate,
-    },
-    { status: 201 }
+      totalDays: pricing.days,
+      dailyRate: pricing.dailyRate,
+      totalPrice: pricing.total,
+      formattedTotal: formatPrice(pricing.total),
+      status: "confirmed" as const,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Log the rental (in production, save to database)
+    console.log("Rental confirmed:", confirmation);
+
+    // Simulate a small delay for realism
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return NextResponse.json(confirmation, { status: 201 });
+  } catch (error) {
+    console.error("Rental API error:", error);
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { message: "Use POST to create a rental" },
+    { status: 405 }
   );
 }

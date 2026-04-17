@@ -1,111 +1,117 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { GearItem } from "@/lib/validation";
-import { StepSelection } from "./StepSelection";
-import { StepConfiguration } from "./StepConfiguration";
-import { StepSummary } from "./StepSummary";
-import { StepConfirmation } from "./StepConfirmation";
-import { cn } from "@/lib/utils";
+import { DateSelection } from "./DateSelection";
+import { PriceSummary } from "./PriceSummary";
+import { Confirmation } from "./Confirmation";
 
-export type RentalStep = "selection" | "configuration" | "summary" | "confirmation";
-
-export interface RentalState {
-  gear: GearItem;
-  startDate?: Date;
-  endDate?: Date;
-  customerName: string;
-  customerEmail: string;
-}
+export type RentalFlowStep = "selecting" | "configuring" | "reviewing" | "confirmed";
 
 interface RentalFlowProps {
-  gear: GearItem;
+  item: GearItem;
 }
 
-const STEPS: { id: RentalStep; label: string }[] = [
-  { id: "selection", label: "Equipo" },
-  { id: "configuration", label: "Fechas" },
-  { id: "summary", label: "Resumen" },
-  { id: "confirmation", label: "Confirmación" },
-];
-
-function StepIndicator({ current }: { current: RentalStep }) {
-  const currentIndex = STEPS.findIndex((s) => s.id === current);
-  return (
-    <div className="flex items-center justify-center gap-0">
-      {STEPS.map((step, i) => (
-        <React.Fragment key={step.id}>
-          <div className="flex flex-col items-center">
-            <div
-              className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all",
-                i < currentIndex
-                  ? "bg-neutral-900 text-white"
-                  : i === currentIndex
-                  ? "bg-neutral-900 text-white ring-4 ring-neutral-200"
-                  : "bg-neutral-100 text-neutral-400"
-              )}
-            >
-              {i < currentIndex ? "✓" : i + 1}
-            </div>
-            <span
-              className={cn(
-                "mt-1 text-xs",
-                i === currentIndex ? "font-medium text-neutral-900" : "text-neutral-400"
-              )}
-            >
-              {step.label}
-            </span>
-          </div>
-          {i < STEPS.length - 1 && (
-            <div
-              className={cn(
-                "mb-5 h-0.5 w-12 transition-all",
-                i < currentIndex ? "bg-neutral-900" : "bg-neutral-200"
-              )}
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+export interface RentalDates {
+  startDate: Date;
+  endDate: Date;
 }
 
-export function RentalFlow({ gear }: RentalFlowProps) {
-  const [step, setStep] = useState<RentalStep>("selection");
-  const [state, setState] = useState<RentalState>({
-    gear,
-    customerName: "",
-    customerEmail: "",
-  });
+export function RentalFlow({ item }: RentalFlowProps) {
+  const [step, setStep] = useState<RentalFlowStep>("selecting");
+  const [dates, setDates] = useState<RentalDates | null>(null);
+  const [confirmationId, setConfirmationId] = useState<string | null>(null);
 
-  const update = (partial: Partial<RentalState>) =>
-    setState((prev) => ({ ...prev, ...partial }));
+  const handleDateSelect = (selectedDates: RentalDates) => {
+    setDates(selectedDates);
+    setStep("reviewing");
+  };
+
+  const handleBack = () => {
+    if (step === "reviewing") {
+      setStep("configuring");
+    } else if (step === "configuring") {
+      setStep("selecting");
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!dates) return;
+
+    try {
+      const response = await fetch("/api/rental", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gearId: item.id,
+          startDate: dates.startDate.toISOString(),
+          endDate: dates.endDate.toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to confirm rental");
+      }
+
+      const data = await response.json();
+      setConfirmationId(data.id);
+      setStep("confirmed");
+    } catch (error) {
+      console.error("Rental confirmation failed:", error);
+      // TODO: Show error toast
+    }
+  };
+
+  const handleReset = () => {
+    setStep("selecting");
+    setDates(null);
+    setConfirmationId(null);
+  };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <StepIndicator current={step} />
+    <div className="w-full">
+      {step === "selecting" && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Rentar este equipo</h3>
+          <p className="text-muted-foreground">
+            Selecciona las fechas para tu renta y confirma tu reservación.
+          </p>
+          <button
+            onClick={() => setStep("configuring")}
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-6 rounded-lg font-medium transition-colors"
+          >
+            Seleccionar Fechas
+          </button>
+        </div>
+      )}
 
-      {step === "selection" && (
-        <StepSelection gear={gear} onNext={() => setStep("configuration")} />
-      )}
-      {step === "configuration" && (
-        <StepConfiguration
-          state={state}
-          onUpdate={update}
-          onNext={() => setStep("summary")}
-          onBack={() => setStep("selection")}
+      {step === "configuring" && (
+        <DateSelection
+          initialDates={dates}
+          onSelect={handleDateSelect}
+          onBack={handleBack}
         />
       )}
-      {step === "summary" && (
-        <StepSummary
-          state={state}
-          onUpdate={update}
-          onNext={() => setStep("confirmation")}
-          onBack={() => setStep("configuration")}
+
+      {step === "reviewing" && dates && (
+        <PriceSummary
+          item={item}
+          dates={dates}
+          onConfirm={handleConfirm}
+          onBack={handleBack}
         />
       )}
-      {step === "confirmation" && <StepConfirmation state={state} />}
+
+      {step === "confirmed" && dates && (
+        <Confirmation
+          item={item}
+          dates={dates}
+          confirmationId={confirmationId}
+          onReset={handleReset}
+        />
+      )}
     </div>
   );
 }

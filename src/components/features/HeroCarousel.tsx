@@ -1,117 +1,153 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { GearItem } from "@/lib/validation";
-import { GearImage } from "./GearImage";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/date-utils";
-import { cn } from "@/lib/utils";
-import { CATEGORY_LABELS } from "@/lib/validation";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { GearItem, CATEGORIES } from "@/lib/validation";
+import { formatPrice } from "@/lib/date-utils";
 
 interface HeroCarouselProps {
   items: GearItem[];
 }
 
 export function HeroCarousel({ items }: HeroCarouselProps) {
-  const router = useRouter();
-  const [current, setCurrent] = useState(Math.floor(Math.random() * items.length));
-  const [animating, setAnimating] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const isInitialized = useRef(false);
 
-  const go = useCallback(
-    (next: number) => {
-      if (animating) return;
-      setAnimating(true);
-      setTimeout(() => {
-        setCurrent(((next % items.length) + items.length) % items.length);
-        setAnimating(false);
-      }, 200);
-    },
-    [animating, items.length]
-  );
+  const onSelect = useCallback(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+  }, [api]);
 
   useEffect(() => {
-    const timer = setInterval(() => go(current + 1), 5000);
-    return () => clearInterval(timer);
-  }, [current, go]);
+    if (!api) return;
 
-  if (!items.length) return null;
+    // Only set initial state once
+    if (!isInitialized.current) {
+      isInitialized.current = true;
+      // Defer to avoid setState in effect
+      requestAnimationFrame(() => {
+        setCurrent(api.selectedScrollSnap());
+      });
+    }
 
-  const item = items[current];
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api, onSelect]);
+
+  // Autoplay
+  useEffect(() => {
+    if (!api) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [api]);
+
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
-    <section className="relative h-[520px] w-full overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
-      {/* Background image */}
-      <GearImage
-        src={item.imageURL}
-        alt={item.name}
-        gearId={item.id}
-        className="absolute inset-0 h-full w-full opacity-60"
-        priority
-      />
+    <section className="w-full py-8">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-semibold mb-6 text-center">
+          Equipo Destacado
+        </h2>
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/80 via-neutral-900/40 to-transparent" />
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "center",
+            loop: true,
+          }}
+          className="w-full max-w-5xl mx-auto"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {items.map((item, index) => (
+              <CarouselItem
+                key={item.id}
+                className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3"
+              >
+                <Link href={`/gear/${item.id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+                    <div className="relative aspect-[4/3] bg-neutral-100">
+                      {item.imageURL ? (
+                        <Image
+                          src={item.imageURL}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          priority={index < 2}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-neutral-400 text-sm">
+                            Cargando imagen...
+                          </div>
+                        </div>
+                      )}
+                      <Badge
+                        variant="secondary"
+                        className="absolute top-3 left-3"
+                      >
+                        {CATEGORIES[item.category].name}
+                      </Badge>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg line-clamp-1">
+                        {item.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {item.description}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="text-lg font-bold text-primary">
+                          {formatPrice(item.dailyRate)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          /día
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex -left-12" />
+          <CarouselNext className="hidden md:flex -right-12" />
+        </Carousel>
 
-      {/* Content */}
-      <div
-        className={cn(
-          "absolute inset-0 flex flex-col justify-end p-8 transition-opacity duration-200",
-          animating ? "opacity-0" : "opacity-100"
-        )}
-      >
-        <Badge variant="secondary" className="mb-3 w-fit">
-          {CATEGORY_LABELS[item.category]}
-        </Badge>
-        <h2 className="mb-2 text-3xl font-bold text-white md:text-4xl">{item.name}</h2>
-        <p className="mb-4 max-w-lg text-neutral-300 line-clamp-2">{item.description}</p>
-
-        <div className="flex items-center gap-4">
-          <span className="text-2xl font-semibold text-white">
-            {formatCurrency(item.dailyRate)}
-            <span className="text-sm font-normal text-neutral-400"> / día</span>
-          </span>
-          <Button
-            onClick={() => router.push(`/gear/${item.id}`)}
-            size="lg"
-            className="bg-white text-neutral-900 hover:bg-neutral-100"
-          >
-            Rentar ahora
-          </Button>
+        {/* Dots indicator */}
+        <div className="flex justify-center gap-2 mt-4">
+          {items.map((_, index) => (
+            <button
+              key={index}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                index === current ? "bg-primary" : "bg-neutral-300"
+              }`}
+              onClick={() => api?.scrollTo(index)}
+              aria-label={`Ir al slide ${index + 1}`}
+            />
+          ))}
         </div>
-      </div>
-
-      {/* Navigation arrows */}
-      <button
-        onClick={() => go(current - 1)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/40"
-        aria-label="Anterior"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => go(current + 1)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/40"
-        aria-label="Siguiente"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </button>
-
-      {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
-        {items.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => go(i)}
-            className={cn(
-              "h-1.5 rounded-full transition-all duration-300",
-              i === current ? "w-6 bg-white" : "w-1.5 bg-white/40"
-            )}
-            aria-label={`Ir a diapositiva ${i + 1}`}
-          />
-        ))}
       </div>
     </section>
   );

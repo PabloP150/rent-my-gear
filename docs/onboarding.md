@@ -1,510 +1,589 @@
-# Onboarding Guide — Rent my Gear
+# Developer Onboarding Guide
 
-Welcome to the project. This guide gets a new developer from zero to a running app, explains every architectural decision you'll encounter in the first week, and covers the two most common maintenance tasks: debugging GCS and adding a new category.
-
----
+Welcome to the Rent my Gear project! This guide will help you understand the codebase, set up your development environment, and start contributing.
 
 ## Table of Contents
 
-1. [Prerequisites](#1-prerequisites)
-2. [First Run](#2-first-run)
-3. [How the Codebase Is Organized](#3-how-the-codebase-is-organized)
-4. [Mental Model: How a Page Renders](#4-mental-model-how-a-page-renders)
-5. [Mental Model: How a Rental Is Processed](#5-mental-model-how-a-rental-is-processed)
-6. [Mental Model: How Images Work](#6-mental-model-how-images-work)
-7. [Key Patterns to Know](#7-key-patterns-to-know)
-8. [Running and Writing Tests](#8-running-and-writing-tests)
-9. [Debugging the GCS Connection](#9-debugging-the-gcs-connection)
-10. [How to Add a New Category](#10-how-to-add-a-new-category)
-11. [Common Mistakes](#11-common-mistakes)
+1. [Quick Start](#quick-start)
+2. [Project Overview](#project-overview)
+3. [Code Architecture](#code-architecture)
+4. [Key Concepts](#key-concepts)
+5. [Development Workflow](#development-workflow)
+6. [Debugging Guide](#debugging-guide)
+7. [Adding a New Category](#adding-a-new-category)
+8. [Common Tasks](#common-tasks)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
-## 1. Prerequisites
+## Quick Start
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Node.js | 20+ | `nvm use 20` |
-| npm | 10+ | bundled with Node |
-| Python | 3.11+ | for GCS/Unsplash scripts only |
-| uv | latest | `pip install uv` |
+### Prerequisites
 
-You need one API key to run the app locally:
+- Node.js 18+
+- npm or yarn
+- Python 3.10+ with `uv` (for scripts)
+- Google Cloud account (for GCS)
+- Google AI API key (for Nano Banana)
 
-- **`NANO_BANANA_API_KEY`** — A Gemini API key from Google AI Studio. The free tier is sufficient for development.
-
-GCS credentials are optional. The app runs fully without them; 8 of the 50 gear items will generate images via Gemini on first request instead of loading from a CDN.
-
----
-
-## 2. First Run
+### Setup Steps
 
 ```bash
-# Clone and install
-cd "semana 3"
+# 1. Clone and install
+git clone <repo-url>
+cd rent-my-gear
 npm install
 
-# Create environment file
-cat > .env.local << 'EOF'
-NANO_BANANA_API_KEY=your_gemini_api_key_here
-EOF
+# 2. Configure environment
+cp .env.example .env.local
+# Edit .env.local with your credentials
 
-# Start development server
+# 3. Run development server
 npm run dev
-# → http://localhost:3000
-```
 
-The app starts without GCS. The first time you navigate to a gear item with a `null` imageURL (e.g., any item prefixed `da-011`), you'll see "Generando imagen…" for a few seconds while Gemini generates the image.
+# 4. Open http://localhost:3000
+```
 
 ---
 
-## 3. How the Codebase Is Organized
+## Project Overview
+
+### What is Rent my Gear?
+
+A premium equipment rental marketplace where users can:
+- Browse 50+ items across 3 categories
+- Search and filter equipment
+- Select rental dates and see pricing
+- Complete rental reservations
+
+### Technology Choices
+
+| Technology | Why We Use It |
+|------------|---------------|
+| Next.js 16+ | Modern React framework with App Router for optimal performance |
+| Tailwind CSS | Rapid UI development with utility classes |
+| shadcn/ui | High-quality, accessible component library |
+| Zod | Type-safe runtime validation |
+| Google Gemini | AI image generation for missing product photos |
+| GCS | Reliable cloud storage for generated images |
+
+### Key Features
+
+1. **Smart Image Strategy**: Uses existing Unsplash images when available, generates with AI when not
+2. **Real-time Search**: Instant filtering without page reload
+3. **Multi-step Rental Flow**: Guided experience from selection to confirmation
+4. **Spanish UI**: Full localization for Spanish-speaking users
+
+---
+
+## Code Architecture
+
+### Directory Structure
 
 ```
 src/
-├── app/          ← Next.js pages and API routes (routing layer)
-├── components/   ← React UI (features/ for domain, ui/ for primitives)
-├── services/     ← Business logic (never import in components directly)
-├── lib/          ← Pure utilities: Zod schemas, date math, className helper
-├── config/       ← Environment variable validation
-├── hooks/        ← React hooks (currently just use-toast)
-└── data/         ← inventory.json — the database
+├── app/           # Next.js pages and API routes
+├── components/    # React components
+│   ├── ui/        # Reusable UI primitives (shadcn)
+│   └── features/  # Feature-specific components
+├── services/      # Business logic
+├── lib/           # Utilities and validation
+├── config/        # Environment configuration
+└── data/          # Static data (inventory)
 ```
 
-**The rule:** Data flows down. Pages call services. Services read/write `data/`. Components receive props from pages. Components should never `import inventoryService` directly — they get data as props from Server Components or via API fetch calls.
+### Layer Responsibilities
+
+```
+┌─────────────────────────────────────────────┐
+│              Presentation Layer              │
+│   (app/, components/)                        │
+│   - React components                         │
+│   - User interaction handling                │
+├─────────────────────────────────────────────┤
+│              Business Layer                  │
+│   (services/)                                │
+│   - inventoryService: Gear management        │
+│   - imageService: Image resolution           │
+│   - storageService: Cloud storage            │
+├─────────────────────────────────────────────┤
+│              Data Layer                      │
+│   (data/, external APIs)                     │
+│   - inventory.json                           │
+│   - Google Cloud Storage                     │
+│   - Gemini AI API                            │
+└─────────────────────────────────────────────┘
+```
+
+### Key Files to Understand
+
+| File | Purpose | Key Concepts |
+|------|---------|--------------|
+| `src/lib/validation.ts` | Zod schemas | Type definitions, validation rules |
+| `src/services/inventoryService.ts` | Data access | Caching, CRUD operations |
+| `src/services/imageService.ts` | Image logic | AI generation, GCS upload |
+| `src/components/features/RentalFlow/index.tsx` | Rental wizard | Multi-step form, state machine |
 
 ---
 
-## 4. Mental Model: How a Page Renders
+## Key Concepts
 
-This project uses Next.js App Router with **React Server Components**. Understanding the split between server and client is essential.
-
-### Server Components (no `"use client"`)
-
-`src/app/page.tsx`, `src/app/category/[id]/page.tsx`, `src/app/gear/[id]/page.tsx` are all Server Components. They run **only on the server** (or at build time). They can:
-
-- Directly call `inventoryService` functions
-- Read the filesystem
-- Import server-only modules
-
-They **cannot** use `useState`, `useEffect`, browser APIs, or event handlers.
-
-### Client Components (`"use client"`)
-
-`GearImage`, `HeroCarousel`, `GearGrid`, and all of `RentalFlow/` are Client Components. They:
-
-- Run on both server (for initial HTML) and client (for hydration and interactivity)
-- Can use hooks and browser APIs
-- Receive data via props from their parent Server Component
-- Make `fetch()` calls to API routes when they need dynamic server data
-
-### Why `HeroCarousel` had a hydration bug
-
-Any value computed with `Math.random()` inside a component's render function will produce different results on server vs client, causing React to throw a hydration mismatch error and discard the server-rendered HTML. The fix is to compute random values inside `useEffect` (client-only) and initialize state with a deterministic value.
+### 1. Server vs Client Components
 
 ```typescript
-// Wrong — runs on both server and client, produces different results
-const [current, setCurrent] = useState(Math.floor(Math.random() * items.length));
-
-// Correct — server and client both start at 0; randomness applied after hydration
-const [current, setCurrent] = useState(0);
-useEffect(() => {
-  setCurrent(Math.floor(Math.random() * items.length));
-}, []);
-```
-
----
-
-## 5. Mental Model: How a Rental Is Processed
-
-The rental wizard is a **client-side state machine** in `src/components/features/RentalFlow/index.tsx`. No data is persisted to a server between steps — all state lives in React `useState`.
-
-```
-Step 1 — StepSelection
-  → User views gear details
-  → Clicks "Seleccionar fechas"
-  → Parent sets step = "configuration"
-
-Step 2 — StepConfiguration
-  → User picks a date range via DayPicker calendar
-  → Parent onUpdate() merges { startDate, endDate } into RentalState
-  → Parent sets step = "summary"
-
-Step 3 — StepSummary
-  → User fills customerName and customerEmail
-  → Local validation (regex + length) — no Zod here, intentionally simple
-  → Parent onUpdate() merges customer data
-  → Parent sets step = "confirmation"
-
-Step 4 — StepConfirmation
-  → Displays full summary with price breakdown
-  → User clicks "Confirmar Renta"
-  → POST /api/rental with full RentalState data
-  → On success: shows confirmation card with rentalId
-  → On error: toast + button resets for retry
-```
-
-The rental API currently generates a mock `rentalId` (`RMG-<8 hex chars>`) and logs to the console. There is no database write. Replacing this with a real database write means modifying only `src/app/api/rental/route.ts` — the rest of the system is unchanged.
-
----
-
-## 6. Mental Model: How Images Work
-
-See [image-resolution.md](image-resolution.md) for sequence diagrams. The short version:
-
-1. **Inventory has a URL** → browser loads it directly, no API involved
-2. **Inventory has `null`** → `GearImage` component calls `/api/generate-image` → Gemini generates and returns a base64 data URL → displayed immediately
-3. **Image URL fails to load** (`onError`) → camera icon placeholder shown; Gemini is **not** re-triggered
-
-The 8 items without images are: `da-011`, `da-012`, `da-013`, `da-014`, `da-015`, `mc-018`, `mc-019`, `fv-018`.
-
----
-
-## 7. Key Patterns to Know
-
-### Zod schemas as the single source of truth
-
-Every type in the codebase is derived from a Zod schema:
-
-```typescript
-// In src/lib/validation.ts
-export const gearItemSchema = z.object({ ... });
-export type GearItem = z.infer<typeof gearItemSchema>;
-```
-
-Never write a manual TypeScript `interface` for data that passes through an API boundary. Add it to `validation.ts`, then `z.infer<>` it.
-
-### `safeParse` for API boundaries, `parse` for trusted internal data
-
-```typescript
-// API route — user input might be wrong, handle gracefully
-const result = rentalRequestRefinedSchema.safeParse(body);
-if (!result.success) {
-  return NextResponse.json({ error: result.error.issues[0].message }, { status: 422 });
+// Server Component (default) - runs on server
+// src/app/page.tsx
+export default async function HomePage() {
+  const items = await getRandomGear(5); // Server-side fetch
+  return <HeroCarousel items={items} />;
 }
 
-// Inventory load — if this fails, the data file is corrupt and we want to crash loudly
-const items = z.array(gearItemSchema).parse(rawJson);
+// Client Component - runs in browser
+// src/components/features/HeroCarousel.tsx
+"use client"; // This directive makes it a client component
+
+import { useState } from "react";
+export function HeroCarousel({ items }) {
+  const [current, setCurrent] = useState(0);
+  // ...
+}
 ```
 
-### Lazy environment validation
-
-`getEnv()` in `src/config/env.ts` validates on first call and caches. Never access `process.env` directly in application code — always go through `getEnv()`. This ensures a clear error message instead of a silent `undefined`.
+### 2. Zod Validation
 
 ```typescript
-// Wrong
-const key = process.env.NANO_BANANA_API_KEY;
+// src/lib/validation.ts
 
-// Right
-const { NANO_BANANA_API_KEY } = getEnv();
-```
-
-### `cn()` for conditional class names
-
-All Tailwind class composition goes through `cn()` from `src/lib/utils.ts`. It combines `clsx` (conditional classes) and `tailwind-merge` (deduplication):
-
-```typescript
-import { cn } from "@/lib/utils";
-
-<div className={cn("base-class", isActive && "active-class", className)} />
-```
-
-### `@/` path alias
-
-All imports from within `src/` use `@/`:
-
-```typescript
-import { GearItem } from "@/lib/validation";
-import { getGearById } from "@/services/inventoryService";
-```
-
-Never use relative paths like `../../services/inventoryService`.
-
----
-
-## 8. Running and Writing Tests
-
-```bash
-npm run test:run          # Run all 80 tests once (CI mode)
-npm run test              # Watch mode — re-runs on save
-npx vitest run <file>     # Single file
-```
-
-Tests live next to the files they test:
-
-```
-src/lib/date-utils.ts
-src/lib/date-utils.test.ts          ← unit tests
-
-src/services/imageService.ts
-src/services/imageService.test.ts   ← unit tests with mocked fetch
-
-src/components/features/GearImage.tsx
-src/components/features/GearImage.test.tsx  ← component tests
-
-src/components/features/RentalFlow/
-├── index.tsx
-├── RentalFlow.test.tsx              ← step navigation unit tests
-└── RentalFlow.integration.test.tsx ← full wizard + API integration tests
-```
-
-### What is mocked in every test
-
-`src/test/setup.tsx` globally mocks three Next.js modules that don't work in jsdom:
-
-| Module | Mock |
-|--------|------|
-| `next/navigation` | `useRouter` returns `{ push, back, replace }` as `vi.fn()` |
-| `next/image` | Rendered as a plain `<img>` tag |
-| `next/link` | Rendered as a plain `<a>` tag |
-
-Any test that renders a component using `useToast` should mock it locally:
-
-```typescript
-const mockToast = vi.fn();
-vi.mock("@/hooks/use-toast", () => ({
-  useToast: () => ({ toast: mockToast }),
-}));
-```
-
-### Writing a test for a new service method
-
-```typescript
-import { describe, it, expect, beforeEach } from "vitest";
-import { resetCache, getAvailableGear } from "./inventoryService";
-
-describe("getAvailableGear", () => {
-  beforeEach(() => resetCache());
-
-  it("returns only items where available === true", () => {
-    const items = getAvailableGear();
-    expect(items.every((i) => i.available)).toBe(true);
-  });
+// Define the schema
+export const gearItemSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  category: z.enum(CATEGORY_IDS),
+  dailyRate: z.number().positive(),
+  imageURL: z.string().url().nullable(),
 });
+
+// Use for validation
+export function validateGearItem(data: unknown): GearItem {
+  return gearItemSchema.parse(data); // Throws if invalid
+}
+
+// Safe validation (doesn't throw)
+const result = gearItemSchema.safeParse(data);
+if (result.success) {
+  // result.data is typed as GearItem
+}
+```
+
+### 3. Image Resolution Strategy
+
+```typescript
+// src/services/imageService.ts
+
+export async function getOrGenerateImage(gearId: string) {
+  const item = await getGearById(gearId);
+
+  // Strategy 1: Use existing URL
+  if (item.imageURL) {
+    return item.imageURL;
+  }
+
+  // Strategy 2: Generate with AI
+  const base64 = await generateImageWithAI(item);
+
+  // Strategy 3: Persist to GCS
+  const url = await uploadImageFromBase64(base64, gearId);
+
+  // Strategy 4: Update inventory for future requests
+  await updateGearImage(gearId, url);
+
+  return url;
+}
+```
+
+### 4. Rental Flow State Machine
+
+```typescript
+// src/components/features/RentalFlow/index.tsx
+
+type RentalFlowStep = "selecting" | "configuring" | "reviewing" | "confirmed";
+
+function RentalFlow({ item }) {
+  const [step, setStep] = useState<RentalFlowStep>("selecting");
+
+  // State transitions
+  // selecting -> configuring (click "Seleccionar Fechas")
+  // configuring -> reviewing (select dates + click "Continuar")
+  // reviewing -> confirmed (API success)
+}
 ```
 
 ---
 
-## 9. Debugging the GCS Connection
+## Development Workflow
 
-GCS is optional. You only need this section if you are enabling image persistence (Option A).
-
-### Step 1 — Verify environment variables
+### Running the App
 
 ```bash
-node -e "
-const { getEnv } = require('./src/config/env.ts');
-const env = getEnv();
-console.log('GCS_BUCKET_NAME:', env.GCS_BUCKET_NAME);
-console.log('GCS_PROJECT_ID:', env.GCS_PROJECT_ID);
-console.log('GOOGLE_APPLICATION_CREDENTIALS:', env.GOOGLE_APPLICATION_CREDENTIALS);
-"
+# Development mode (with hot reload)
+npm run dev
+
+# Production build
+npm run build
+npm start
+
+# Linting
+npm run lint
+
+# Testing
+npm run test:run
 ```
 
-If this throws, the variable is missing or misformatted. Check `.env.local` for typos and ensure there are no quotes around values.
+### Making Changes
 
-### Step 2 — Verify the service account key file
+1. **Create a branch**: `git checkout -b feature/my-feature`
+2. **Make changes**: Edit files, add tests
+3. **Run tests**: `npm run test:run`
+4. **Run lint**: `npm run lint`
+5. **Commit**: `git commit -m "feat: add my feature"`
+6. **Push**: `git push origin feature/my-feature`
+
+### Code Style
+
+- **TypeScript**: Strict mode enabled
+- **Components**: Functional components with hooks
+- **Naming**: camelCase for functions, PascalCase for components
+- **Files**: kebab-case for files, PascalCase for component files
+
+---
+
+## Debugging Guide
+
+### Debugging GCS Connection
+
+#### Step 1: Verify Environment Variables
 
 ```bash
-# The key file must exist at the path specified in GOOGLE_APPLICATION_CREDENTIALS
-cat "$GOOGLE_APPLICATION_CREDENTIALS" | python3 -m json.tool | head -5
-# Expected output: { "type": "service_account", "project_id": "...", ...
+# Check if variables are set
+cat .env.local | grep GCS
 ```
 
-If the file doesn't exist or is malformed JSON, the GCS client will throw `Error: Could not load the default credentials`.
+Expected output:
+```
+GCS_BUCKET_NAME=your-bucket-name
+GCS_PROJECT_ID=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=.gcp/service-account.json
+```
 
-### Step 3 — Run the smoke test script
+#### Step 2: Verify Service Account File
+
+```bash
+# Check if file exists
+ls -la .gcp/service-account.json
+
+# Verify JSON structure
+cat .gcp/service-account.json | head -20
+```
+
+Expected structure:
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...",
+  "client_email": "...",
+  "client_id": "...",
+  ...
+}
+```
+
+#### Step 3: Run GCS Smoke Test
 
 ```bash
 cd scripts
 uv run setup_gcs.py
 ```
 
-The script performs:
-1. Bucket existence check — creates if missing
-2. `allUsers` + `storage.objectViewer` IAM binding (makes objects public)
-3. Upload a test file (`rmg-smoke-test.txt`)
-4. Verify public URL is accessible via `requests.get()`
-5. Delete the test file
+Expected output:
+```
+==================================================
+  Rent my Gear - GCS Setup
+==================================================
 
-Common errors and their fixes:
+📋 Configuration:
+   Bucket:  your-bucket-name
+   Project: your-project-id
+   Creds:   /path/to/.gcp/service-account.json
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `403 Forbidden` | Service account lacks Storage Admin role | Grant `roles/storage.admin` in GCP IAM |
-| `404 bucket not found` | Bucket doesn't exist | Script creates it — check `GCS_PROJECT_ID` |
-| `public URL returns 403` | Uniform bucket-level access prevents per-object ACLs | Disable "Enforce public access prevention" on the bucket in GCP Console |
-| `GOOGLE_APPLICATION_CREDENTIALS not set` | Variable not in `.env.local` or wrong path | Use absolute path, verify file exists |
+📦 Checking bucket: your-bucket-name
+   ✅ Bucket already exists
 
-### Step 4 — Verify from the API route
+🔓 Configuring public access...
+   ✅ Public read access enabled
 
-Add a temporary log to `src/services/storageService.ts` to confirm the client initializes:
+🧪 Running smoke test...
+   1️⃣  Uploading test file...
+      ✅ Upload successful
+   2️⃣  Verifying public URL...
+      🔗 https://storage.googleapis.com/your-bucket/smoke-test.txt
+      ✅ Public access verified
+   3️⃣  Cleaning up test file...
+      ✅ Test file deleted
+
+==================================================
+✅ GCS setup completed successfully!
+==================================================
+```
+
+#### Common GCS Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `GOOGLE_APPLICATION_CREDENTIALS file not found` | Wrong path | Use relative path from project root: `.gcp/service-account.json` |
+| `Permission denied` | Missing IAM roles | Add `Storage Admin` role to service account |
+| `Bucket name already taken` | Name conflict | Choose a globally unique bucket name |
+| `Network error` | Firewall/proxy | Check network connectivity |
+
+#### Step 4: Test Image Upload
 
 ```typescript
-function getStorage(): Storage {
-  if (!_storage) {
-    const env = requireGcsEnv();
-    console.log("[storageService] Initializing GCS for project:", env.GCS_PROJECT_ID);
-    _storage = new Storage({ ... });
-  }
-  return _storage;
+// Add to a test file or API route
+import { uploadImageFromBase64 } from "@/services/storageService";
+
+const testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+try {
+  const url = await uploadImageFromBase64(testBase64, "test-image", "image/png");
+  console.log("Upload successful:", url);
+} catch (error) {
+  console.error("Upload failed:", error);
 }
 ```
 
-Then trigger a request to `/api/generate-image?gearId=da-011` and watch the terminal. Remove the log before committing.
-
-### Step 5 — Check if images are persisting
-
-After a successful GCS upload, `imageService.persistImageUrl()` writes back to `inventory.json`. Verify:
-
-```bash
-node -e "
-const inv = require('./src/data/inventory.json');
-const item = inv.find(i => i.id === 'da-011');
-console.log(item.imageURL);
-// Should be: https://storage.googleapis.com/<bucket>/gear/da-011.webp
-"
-```
-
-If it still shows `null`, check that `persistImageUrl` is not hitting its early-return guard (`imageURL.startsWith("data:")`) — which it shouldn't, since GCS returns an HTTPS URL.
-
 ---
 
-## 10. How to Add a New Category
+## Adding a New Category
 
-Adding a category requires changes in **five places**. Miss any one and you'll either get a runtime error or a TypeScript compile error that points you to the right place.
+Adding a new category (e.g., "Equipo de Ski") requires changes in multiple files. Follow these steps carefully to avoid breaking validation schemas.
 
-### The five places
-
-#### 1. `src/lib/validation.ts` — extend the enum
+### Step 1: Update Validation Schema
 
 ```typescript
-export const categorySchema = z.enum([
+// src/lib/validation.ts
+
+// 1. Add to CATEGORY_IDS array
+export const CATEGORY_IDS = [
   "fotografia-video",
   "montana-camping",
   "deportes-acuaticos",
-  "audio-iluminacion",   // ← add here
-]);
-```
+  "ski-snowboard",        // ← Add new category ID
+] as const;
 
-The `Category` type is inferred — all downstream TypeScript types update automatically.
-
-#### 2. `src/lib/validation.ts` — add the display label
-
-```typescript
-export const CATEGORY_LABELS: Record<Category, string> = {
-  "fotografia-video": "Fotografía y Video",
-  "montana-camping": "Montaña y Camping",
-  "deportes-acuaticos": "Deportes Acuáticos",
-  "audio-iluminacion": "Audio e Iluminación",  // ← add here
+// 2. Add to CATEGORIES object
+export const CATEGORIES: Record<CategoryId, { name: string; description: string }> = {
+  "fotografia-video": {
+    name: "Fotografía y Video",
+    description: "Cámaras, lentes, iluminación y equipo audiovisual profesional",
+  },
+  "montana-camping": {
+    name: "Montaña y Camping",
+    description: "Tiendas, mochilas, equipo técnico de montaña y accesorios",
+  },
+  "deportes-acuaticos": {
+    name: "Deportes Acuáticos",
+    description: "Kayaks, SUP, equipo de buceo, surf y deportes náuticos",
+  },
+  // ↓ Add new category
+  "ski-snowboard": {
+    name: "Ski y Snowboard",
+    description: "Esquís, tablas de snowboard, botas y equipo de nieve",
+  },
 };
 ```
 
-TypeScript's `Record<Category, string>` enforces exhaustiveness — the build will fail if you add to the enum without adding to `CATEGORY_LABELS`.
-
-#### 3. `src/components/features/CategoryButtons.tsx` — add the UI card
+### Step 2: Add Category Button
 
 ```typescript
-const CATEGORIES = [
-  // ...existing entries
-  {
-    id: "audio-iluminacion" as Category,
-    label: "Audio e Iluminación",
-    description: "Micrófonos, grabadoras y sistemas de iluminación",
-    icon: Mic,                          // import from lucide-react
-    gradient: "from-yellow-500/10 to-amber-500/10",
-    iconColor: "text-yellow-500",
-  },
-];
+// src/components/features/CategoryButtons.tsx
+
+// The component automatically reads from CATEGORIES,
+// so no changes needed here if you use the pattern:
+Object.entries(CATEGORIES).map(([id, { name, description }]) => (
+  // Category button JSX
+))
+
+// If you have hardcoded buttons, add:
+<CategoryButton
+  id="ski-snowboard"
+  name="Ski y Snowboard"
+  icon={<Snowflake className="w-8 h-8" />}
+/>
 ```
 
-#### 4. `src/app/category/[id]/page.tsx` — add to static generation
+### Step 3: Add Category Page (if needed)
+
+The dynamic route `src/app/category/[id]/page.tsx` already handles any valid category ID. No changes needed if you use the validation:
 
 ```typescript
-export function generateStaticParams() {
-  return [
-    { id: "fotografia-video" },
-    { id: "montana-camping" },
-    { id: "deportes-acuaticos" },
-    { id: "audio-iluminacion" },        // ← add here
-  ];
+// src/app/category/[id]/page.tsx
+export default async function CategoryPage({ params }) {
+  const { id } = await params;
+
+  // This validates the category ID automatically
+  if (!isValidCategory(id)) {
+    notFound();
+  }
+
+  const items = await getGearByCategory(id);
+  // ...
 }
 ```
 
-Without this entry, the category page won't be statically generated and will fall through to a 404.
+### Step 4: Add Inventory Items
 
-#### 5. `src/data/inventory.json` — add items
-
-Add gear items with the new category ID. Follow the existing naming convention (`al-001`, `al-002`, etc.) and match the schema exactly:
+Add items to `src/data/inventory.json`:
 
 ```json
 {
-  "id": "al-001",
-  "name": "Rode NT-USB Mini",
-  "category": "audio-iluminacion",
-  "description": "Micrófono USB condensador compacto para grabación profesional",
-  "dailyRate": 150,
-  "imageURL": "https://images.unsplash.com/...",
+  "id": "ski-001",
+  "name": "Esquís Rossignol Experience 88",
+  "category": "ski-snowboard",
+  "description": "Esquís all-mountain premium para todos los niveles",
   "specs": {
-    "Patrón": "Cardioide",
-    "Conexión": "USB-C",
-    "Frecuencia": "20Hz-20kHz"
+    "longitud": "176cm",
+    "radio": "17m",
+    "nivel": "Intermedio-Avanzado"
   },
-  "available": true
+  "dailyRate": 450,
+  "imageURL": null
 }
 ```
 
-### Verification checklist
+Or use the Python script:
 
-After making all five changes:
+```python
+# scripts/generate_inventory.py
+
+# Add to ITEMS dictionary
+"ski-snowboard": [
+    ("Esquís Rossignol Experience 88", "Esquís all-mountain premium", {"longitud": "176cm"}, 450, "ski equipment"),
+    ("Tabla Burton Custom", "Snowboard freestyle versátil", {"longitud": "158cm"}, 400, "snowboard"),
+    # ... more items
+],
+```
+
+### Step 5: Verify Changes
 
 ```bash
-# TypeScript must compile without errors
+# 1. Run type check
 npx tsc --noEmit
 
-# Tests must still pass (category-related tests use z.enum internally)
+# 2. Run tests
 npm run test:run
 
-# Dev server must show new category on homepage
+# 3. Build project
+npm run build
+
+# 4. Test in browser
 npm run dev
-# → Navigate to /category/audio-iluminacion
-# → Should display items with correct label
+# Navigate to /category/ski-snowboard
 ```
 
-### Why `categorySchema` must be updated first
+### Checklist for New Category
 
-The Zod enum is the **single source of truth** for what constitutes a valid category. Everything else (`CATEGORY_LABELS`, route params, inventory validation) derives from it. If you add items to `inventory.json` before updating the enum, `inventoryService` will throw on startup:
-
-```
-ZodError: Invalid enum value. Expected "fotografia-video" | "montana-camping" | "deportes-acuaticos", received "audio-iluminacion"
-```
-
-This is intentional — fail loudly at startup rather than silently serve wrong data.
+- [ ] Added category ID to `CATEGORY_IDS` in `validation.ts`
+- [ ] Added category info to `CATEGORIES` in `validation.ts`
+- [ ] TypeScript compiles without errors
+- [ ] Added at least one item to inventory
+- [ ] Category page loads correctly
+- [ ] Items display in category grid
+- [ ] Search finds items in new category
+- [ ] Rental flow works for new items
 
 ---
 
-## 11. Common Mistakes
+## Common Tasks
 
-### `new Date("2026-05-01")` in tests
+### Adding a New Component
 
-This parses as UTC midnight. In any timezone behind UTC (e.g., Mexico City, UTC-6), it shifts to April 30. Use `new Date(2026, 4, 1, 12)` (local noon) in tests to stay timezone-safe.
+```bash
+# 1. Create component file
+touch src/components/features/MyComponent.tsx
 
-### Accessing `process.env` directly
+# 2. Add component code
+# 3. Export from index if needed
+# 4. Import and use in pages
+```
 
-Always use `getEnv()`. Direct `process.env` access bypasses validation and returns `undefined` silently.
+### Adding an API Route
 
-### Importing a service in a Client Component
+```typescript
+// src/app/api/my-route/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-Services like `inventoryService` use `fs` and other Node.js modules. Importing them in a `"use client"` component will crash the browser bundle. Pass data as props from the parent Server Component, or fetch via an API route.
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ message: "Hello" });
+}
 
-### Forgetting `resetCache()` in service tests
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  // Process request
+  return NextResponse.json({ success: true });
+}
+```
 
-`inventoryService` caches loaded data in module-level state. Without `resetCache()` in `beforeEach`, tests can contaminate each other depending on execution order.
+### Adding a New Service
 
-### Adding to `CATEGORY_LABELS` without updating `categorySchema` (or vice versa)
+```typescript
+// src/services/myService.ts
+export async function myFunction(param: string): Promise<Result> {
+  // Implementation
+}
 
-TypeScript will catch this: `Record<Category, string>` requires every enum member to have an entry. But you must update the Zod enum *first* before TypeScript knows the new member exists.
+// Export types if needed
+export type MyServiceResult = {
+  // ...
+};
+```
 
-### Expecting Gemini to regenerate on Unsplash 404
+---
 
-`GearImage` only calls the generate-image API when `src` is `null`. If a stored Unsplash URL starts returning 404, the component shows the camera placeholder — it does not auto-regenerate. To fix, set `imageURL: null` in `inventory.json` for the affected items so the next page load triggers generation.
+## Troubleshooting
+
+### Build Errors
+
+| Error | Solution |
+|-------|----------|
+| `Cannot find module` | Run `npm install` |
+| `Type error` | Check TypeScript types |
+| `ESLint error` | Run `npm run lint -- --fix` |
+
+### Runtime Errors
+
+| Error | Solution |
+|-------|----------|
+| `Environment variable not set` | Check `.env.local` |
+| `Image not loading` | Check `next.config.ts` image domains |
+| `API returning 500` | Check server logs |
+
+### Testing Issues
+
+| Issue | Solution |
+|-------|----------|
+| Tests timing out | Increase timeout in test |
+| Mock not working | Check mock setup in `setup.tsx` |
+| Component not found | Check for client/server mismatch |
+
+---
+
+## Getting Help
+
+1. **Documentation**: Check `docs/` folder
+2. **Code Comments**: Read inline comments
+3. **Tests**: Look at test files for usage examples
+4. **Git History**: Check commit messages for context
+
+---
+
+Welcome to the team! 🎉

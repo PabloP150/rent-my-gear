@@ -1,95 +1,153 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { GearItem } from "@/lib/validation";
 
-// Set env var before importing the service
-process.env.NANO_BANANA_API_KEY = "test-key";
+// Sample gear items
+const gearWithoutImage: GearItem = {
+  id: "gear-no-image",
+  name: "Canon EOS R5",
+  category: "fotografia-video",
+  description: "Professional mirrorless camera",
+  specs: { sensor: "45MP" },
+  dailyRate: 500,
+  imageURL: null,
+};
 
-vi.mock("@/data/inventory.json", () => ({
-  default: [
-    { id: "fv-001", name: "Sony A7 IV", imageURL: "https://images.unsplash.com/photo-1" },
-    { id: "da-011", name: "Garmin Descent Mk3i", imageURL: null },
-  ],
-}));
+const gearWithImage: GearItem = {
+  id: "gear-with-image",
+  name: "North Face Tent",
+  category: "montana-camping",
+  description: "4-person tent",
+  specs: { capacity: "4 persons" },
+  dailyRate: 200,
+  imageURL: "https://images.unsplash.com/photo-tent.jpg",
+};
 
-describe("imageService", () => {
+describe("imageService - Nano Banana Fallback", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("returns existing imageURL without calling Gemini", async () => {
-    const { resolveImageUrl } = await import("./imageService");
-    const fetchMock = vi.fn();
-    global.fetch = fetchMock;
-
-    const url = await resolveImageUrl("fv-001", "Sony A7 IV");
-    expect(url).toBe("https://images.unsplash.com/photo-1");
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("calls Gemini when imageURL is null and returns data URL", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        candidates: [{
-          content: {
-            parts: [{ inlineData: { data: "abc123", mimeType: "image/webp" } }],
-          },
-        }],
-      }),
+  describe("resolveImageUrl", () => {
+    it("should return existing imageURL if available", async () => {
+      const { resolveImageUrl } = await import("./imageService");
+      const result = resolveImageUrl(gearWithImage);
+      expect(result).toBe("https://images.unsplash.com/photo-tent.jpg");
     });
-    global.fetch = fetchMock;
 
-    const { resolveImageUrl } = await import("./imageService");
-    const url = await resolveImageUrl("da-011", "Garmin Descent Mk3i");
-    expect(fetchMock).toHaveBeenCalledOnce();
-    expect(url).toContain("data:image/webp;base64,");
-  });
-
-  it("throws when Gemini returns non-ok response", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 500,
-      text: async () => "Internal Server Error",
+    it("should return API endpoint for on-demand generation when no imageURL (Unsplash 404 scenario)", async () => {
+      const { resolveImageUrl } = await import("./imageService");
+      const result = resolveImageUrl(gearWithoutImage);
+      expect(result).toBe("/api/generate-image?id=gear-no-image");
     });
-    global.fetch = fetchMock;
-
-    const { resolveImageUrl } = await import("./imageService");
-    await expect(resolveImageUrl("da-011", "Garmin Descent Mk3i")).rejects.toThrow("[Gemini]");
   });
 
-  it("throws when Gemini response contains no image part", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        candidates: [{
-          content: {
-            parts: [{ text: "No image here, just text" }],
-          },
-        }],
-      }),
+  describe("isImageUrlValid", () => {
+    beforeEach(() => {
+      global.fetch = vi.fn();
     });
-    global.fetch = fetchMock;
 
-    const { resolveImageUrl } = await import("./imageService");
-    await expect(resolveImageUrl("da-011", "Garmin Descent Mk3i")).rejects.toThrow(
-      "[Gemini] Response did not contain an image."
-    );
+    it("should return true for valid accessible URL", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+      } as Response);
+
+      const { isImageUrlValid } = await import("./imageService");
+      const result = await isImageUrlValid("https://example.com/image.jpg");
+      expect(result).toBe(true);
+    });
+
+    it("should return false for 404 response (Unsplash image not found)", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: false,
+        status: 404,
+      } as Response);
+
+      const { isImageUrlValid } = await import("./imageService");
+      const result = await isImageUrlValid("https://images.unsplash.com/404.jpg");
+      expect(result).toBe(false);
+    });
+
+    it("should return false for network error", async () => {
+      vi.mocked(global.fetch).mockRejectedValue(new Error("Network Error"));
+
+      const { isImageUrlValid } = await import("./imageService");
+      const result = await isImageUrlValid("https://example.com/image.jpg");
+      expect(result).toBe(false);
+    });
   });
 
-  it("throws when NANO_BANANA_API_KEY is not set", async () => {
-    vi.resetModules();
-    const saved = process.env.NANO_BANANA_API_KEY;
-    delete process.env.NANO_BANANA_API_KEY;
+  describe("Edge Cases - Unsplash 404 Simulation", () => {
+    it("should handle item where Unsplash originally returned 404 (null imageURL)", async () => {
+      const itemWithUnsplash404: GearItem = {
+        id: "unsplash-404-item",
+        name: "Rare Equipment",
+        category: "deportes-acuaticos",
+        description: "Equipment with no Unsplash match",
+        specs: { type: "rare" },
+        dailyRate: 1000,
+        imageURL: null,
+      };
 
-    vi.doMock("@/data/inventory.json", () => ({
-      default: [{ id: "no-img", name: "No Image Gear", imageURL: null }],
-    }));
+      const { resolveImageUrl } = await import("./imageService");
+      const resolvedUrl = resolveImageUrl(itemWithUnsplash404);
+      expect(resolvedUrl).toBe("/api/generate-image?id=unsplash-404-item");
+    });
 
-    const { resolveImageUrl } = await import("./imageService");
-    await expect(resolveImageUrl("no-img", "No Image Gear")).rejects.toThrow(
-      "[imageService] NANO_BANANA_API_KEY is not set."
-    );
+    it("should identify items needing Nano Banana fallback by null imageURL", () => {
+      const itemsNeedingFallback = [gearWithoutImage, gearWithImage].filter(
+        (item) => item.imageURL === null
+      );
 
-    process.env.NANO_BANANA_API_KEY = saved;
-    vi.resetModules();
+      expect(itemsNeedingFallback).toHaveLength(1);
+      expect(itemsNeedingFallback[0].id).toBe("gear-no-image");
+    });
+
+    it("should generate correct API endpoint pattern for fallback", async () => {
+      const { resolveImageUrl } = await import("./imageService");
+
+      const testCases = [
+        { id: "photo-001", expected: "/api/generate-image?id=photo-001" },
+        { id: "camp-special", expected: "/api/generate-image?id=camp-special" },
+        { id: "water-123", expected: "/api/generate-image?id=water-123" },
+      ];
+
+      for (const testCase of testCases) {
+        const item: GearItem = {
+          ...gearWithoutImage,
+          id: testCase.id,
+          imageURL: null,
+        };
+        expect(resolveImageUrl(item)).toBe(testCase.expected);
+      }
+    });
+  });
+
+  describe("Image URL Validation for Fallback Decision", () => {
+    beforeEach(() => {
+      global.fetch = vi.fn();
+    });
+
+    it("should detect when Unsplash URL becomes invalid (simulating 404)", async () => {
+      // First, URL is valid
+      vi.mocked(global.fetch).mockResolvedValueOnce({ ok: true } as Response);
+
+      const { isImageUrlValid } = await import("./imageService");
+      let result = await isImageUrlValid("https://images.unsplash.com/photo.jpg");
+      expect(result).toBe(true);
+
+      // Later, URL becomes invalid (Unsplash removed the image)
+      vi.mocked(global.fetch).mockResolvedValueOnce({ ok: false, status: 404 } as Response);
+
+      result = await isImageUrlValid("https://images.unsplash.com/photo.jpg");
+      expect(result).toBe(false);
+    });
+
+    it("should handle timeout when checking Unsplash URL", async () => {
+      vi.mocked(global.fetch).mockRejectedValue(new Error("Timeout"));
+
+      const { isImageUrlValid } = await import("./imageService");
+      const result = await isImageUrlValid("https://images.unsplash.com/slow.jpg");
+      expect(result).toBe(false);
+    });
   });
 });

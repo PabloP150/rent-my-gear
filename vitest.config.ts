@@ -6,8 +6,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    setupFiles: ["./src/test/setup.tsx"],
     globals: true,
+    setupFiles: ["./src/test/setup.tsx"],
+    include: ["src/**/*.{test,spec}.{js,ts,jsx,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
@@ -16,6 +17,8 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
 });

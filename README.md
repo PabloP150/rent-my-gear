@@ -1,233 +1,238 @@
-# Rent My Gear
+# Rent my Gear
 
-Premium equipment rental marketplace for photography, mountaineering, and water sports gear.
+Premium equipment rental marketplace for photography, camping, and water sports.
 
-## Smart Insurance
+## Description
 
-Every rental includes **Smart Insurance** — automatically calculated based on gear category:
-
-| Category | Insurance Rate |
-|---|---|
-| `fotografia-video` | **20%** of subtotal |
-| `montana-camping` | **10%** of subtotal |
-| `deportes-acuaticos` | **10%** of subtotal |
-
-### Calculation flow
-
-```mermaid
-flowchart TD
-    A[dailyRate × days] --> B[subtotal]
-    B --> C{category?}
-    C -->|fotografia-video| D[insuranceRate = 0.20]
-    C -->|montana-camping| E[insuranceRate = 0.10]
-    C -->|deportes-acuaticos| F[insuranceRate = 0.10]
-    D --> G[insurance = subtotal × insuranceRate]
-    E --> G
-    F --> G
-    B --> H[tax = subtotal × 0.12 IVA]
-    G --> I[total = subtotal + insurance + tax]
-    H --> I
-```
-
-See [docs/smart-insurance.md](docs/smart-insurance.md) for full details and example breakdowns.
-
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [docs/smart-insurance.md](docs/smart-insurance.md) | Smart Insurance rates, Mermaid calculation diagram, PriceBreakdown interface |
-| [docs/architecture.md](docs/architecture.md) | System overview, layered architecture, data model, request lifecycle, caching, error boundaries |
-| [docs/image-resolution.md](docs/image-resolution.md) | Mermaid sequence diagrams for the full image resolution flow (JSON → Nano Banana → GCS) |
-| [docs/services.md](docs/services.md) | Mermaid class diagram for `inventoryService` and `imageService`; full API reference for all service methods |
-| [docs/onboarding.md](docs/onboarding.md) | New developer guide: mental models, key patterns, debugging GCS, adding a new category |
-| [docs/test-results.md](docs/test-results.md) | Full test run report: 91 tests across 6 files, 100% coverage on core business logic |
-
----
+Rent my Gear is a web application built with Next.js 16+ that allows users to explore and rent professional equipment. The application implements a smart image strategy where images are served from existing URLs or generated on-demand using Nano Banana (Gemini AI) and persisted to Google Cloud Storage.
 
 ## Features
 
-- **Smart Insurance** — Automatic per-category insurance fee (20% photography, 10% others)
-- **Hero Carousel** — 5 random featured items with auto-play
-- **Category browsing** — Fotografía y Video, Montaña y Camping, Deportes Acuáticos
-- **Real-time search** — Filter gear within any category
-- **Rental flow wizard** — 4-step process: Selection → Dates → Summary → Confirmation
-- **AI image generation** — Missing images are generated via Nano Banana (Gemini) and persisted to GCS
-- **Full validation** — Zod schemas on all inputs, environment variables, and API boundaries
+- **Equipment Catalog**: 50 items distributed across 3 categories
+- **Real-time Search**: Instant filtering by name and description
+- **Rental Flow**: Date selection, price summary, and confirmation
+- **AI Image Generation**: Automatic fallback to Nano Banana for items without images
+- **GCS Persistence**: Generated images are permanently saved
+- **Spanish UI**: Interface fully in Spanish
 
----
+## Technologies
+
+- **Framework**: Next.js 16+ (App Router)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Validation**: Zod
+- **AI**: Google Generative AI (Nano Banana / Gemini)
+- **Storage**: Google Cloud Storage
+- **Utilities**: date-fns
+
+## Project Structure
+
+```
+rent-my-gear/
+├── src/
+│   ├── app/                    # App Router pages
+│   │   ├── page.tsx            # Home page
+│   │   ├── category/[id]/      # Category pages
+│   │   ├── gear/[id]/          # Gear detail pages
+│   │   └── api/                # API routes
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui components
+│   │   └── features/           # Feature components
+│   ├── services/               # Business logic
+│   ├── lib/                    # Utilities
+│   ├── config/                 # Environment config
+│   └── data/                   # Mock data
+├── scripts/                    # Python utilities
+└── README.md
+```
 
 ## Setup
 
-### 1. Clone and install dependencies
+### 1. Environment Variables
+
+Copy `.env.example` to `.env.local` and configure:
+
+```bash
+# Google Cloud Storage
+GCS_BUCKET_NAME=your-bucket-name
+GCS_PROJECT_ID=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=.gcp/service-account.json
+
+# Nano Banana (Gemini) API
+NANO_BANANA_API_KEY=your-api-key
+
+# Unsplash (scripts only)
+UNSPLASH_ACCESS_KEY=your-unsplash-key
+```
+
+### 2. Installation
 
 ```bash
 npm install
 ```
 
-### 2. Environment variables
-
-Create `.env.local` in the project root:
-
-```env
-GCS_BUCKET_NAME=your-bucket-name
-GCS_PROJECT_ID=your-gcp-project-id
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/service-account.json
-NANO_BANANA_API_KEY=your-nano-banana-key
-```
-
-> All four variables are required. The app throws a descriptive error on startup if any are missing.
-
-### 3. Setup GCS bucket (first time)
+### 3. Configure GCS (Optional)
 
 ```bash
-# From the scripts/ directory, using uv:
 cd scripts
 uv run setup_gcs.py
 ```
 
-This script creates the bucket, sets public access, and runs a smoke test.
-
-### 4. (Optional) Re-generate inventory images from Unsplash
+### 4. Generate Inventory with Images (Optional)
 
 ```bash
-# Add UNSPLASH_ACCESS_KEY to .env first
 cd scripts
 uv run generate_inventory.py
 ```
 
-### 5. Run the development server
+### 5. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000).
-
----
-
 ## Architecture
 
-```
-src/
-├── app/                        # Next.js App Router
-│   ├── layout.tsx              # Root layout with nav + Toaster
-│   ├── page.tsx                # Home: Carousel + Category buttons
-│   ├── error.tsx / loading.tsx # Global boundaries
-│   ├── category/[id]/          # Category inventory grid
-│   ├── gear/[id]/              # Gear detail + RentalFlow
-│   └── api/
-│       ├── rental/route.ts     # POST — create rental
-│       └── generate-image/     # GET/POST — resolve or generate image
-│
-├── components/
-│   ├── ui/                     # shadcn/ui primitives (Button, Card, Calendar…)
-│   └── features/
-│       ├── HeroCarousel.tsx
-│       ├── CategoryButtons.tsx
-│       ├── GearGrid.tsx
-│       ├── GearImage.tsx       # Image with NanoBanana fallback
-│       └── RentalFlow/         # Multi-step wizard
-│
-├── services/
-│   ├── inventoryService.ts     # CRUD + Fisher-Yates random, 5-min cache
-│   ├── imageService.ts         # imageURL resolution + NanoBanana + GCS persist
-│   └── storageService.ts       # GCS upload/delete wrapper
-│
-├── lib/
-│   ├── validation.ts           # Zod schemas (GearItem, RentalRequest…)
-│   ├── date-utils.ts           # Price calculation, date helpers
-│   └── utils.ts                # cn() Tailwind merge
-│
-├── config/
-│   └── env.ts                  # Lazy Zod env validation
-│
-└── data/
-    └── inventory.json          # 50 mock items (8 without imageURL)
-```
-
-### Image Resolution Strategy
+### Image Strategy
 
 ```
-Client requests gear image
-        │
-        ▼
-  imageURL present? ──Yes──▶ Serve from imageURL (CDN/Unsplash)
-        │
-        No
-        ▼
-  Call Nano Banana API (Gemini gemini-3-pro-image-preview)
-        │
-        ▼
-  Upload base64 result to GCS
-        │
-        ▼
-  Get public URL from GCS
-        │
-        ▼
-  Persist URL to inventory.json ──▶ Return URL to client
+1. Check if item.imageURL exists
+   ├─ YES → Use directly with next/image
+   └─ NO →
+      2. Show loading spinner to user
+      3. Call Nano Banana API to generate image
+      4. Upload result to GCS bucket
+      5. Get public URL from GCS
+      6. Update inventory.json with new URL (persistent)
+      7. Display generated image
 ```
 
----
+### Categories
+
+| ID | Name | Description |
+|----|------|-------------|
+| `fotografia-video` | Photography & Video | Cameras, lenses, lighting, and audiovisual equipment |
+| `montana-camping` | Mountain & Camping | Tents, backpacks, technical mountain gear |
+| `deportes-acuaticos` | Water Sports | Kayaks, SUP, diving gear, surfing |
+
+### Rental Flow
+
+1. **Selection**: View equipment details and specifications
+2. **Configuration**: Select date range with validation
+3. **Summary**: View price breakdown (daily rate × days)
+4. **Confirmation**: Confirm rental and receive confirmation number
+
+## API Routes
+
+### POST /api/rental
+
+Create a new rental.
+
+```json
+{
+  "gearId": "gear-001",
+  "startDate": "2024-01-15T00:00:00Z",
+  "endDate": "2024-01-18T00:00:00Z"
+}
+```
+
+### GET /api/generate-image?id=gear-001
+
+Get or generate image for an item. Redirects to the image URL.
+
+### POST /api/generate-image
+
+Generate image for a specific item.
+
+```json
+{
+  "gearId": "gear-001"
+}
+```
+
+## Python Scripts
+
+### generate_inventory.py
+
+Generates the `inventory.json` file with 50 items and fetches real images from Unsplash.
+
+```bash
+uv run generate_inventory.py
+```
+
+### setup_gcs.py
+
+Configures the GCS bucket with public access and runs a smoke test.
+
+```bash
+uv run setup_gcs.py
+```
+
+## Development
+
+```bash
+# Development
+npm run dev
+
+# Build
+npm run build
+
+# Lint
+npm run lint
+```
 
 ## Testing
 
-**80 tests — 6 files — all passing** (Vitest 4 + React Testing Library 16)
-
-See [docs/test-results.md](docs/test-results.md) for the full report.
-
-| Suite | Tests | Coverage |
-|-------|------:|---------|
-| `date-utils.test.ts` — unit tests for price calculation | 29 | `calculateDays`, `calculatePrice`, `formatDateEs`, `isAvailableDate` |
-| `RentalFlow.integration.test.tsx` — full wizard flow | 23 | Navigation, success toast, error recovery, all 3 categories |
-| `GearImage.test.tsx` — image fallback edge cases | 11 | Unsplash 404, null src, data URL, Nano Banana path |
-| `imageService.test.ts` — Gemini API integration | 3 | Existing URL, Gemini call, Gemini error |
-| `inventoryService.test.ts` — inventory CRUD | 9 | getAll, getById, getByCategory, search, random |
-| `RentalFlow.test.tsx` — wizard unit tests | 5 | Step transitions |
+The project includes a comprehensive testing suite using **Vitest** and **React Testing Library**.
 
 ```bash
-npm run test:run      # Run all 80 tests once
-npm run test          # Watch mode
-npx vitest run src/lib/date-utils.test.ts
-npx vitest run src/components/features/RentalFlow/RentalFlow.integration.test.tsx
-npx vitest run src/components/features/GearImage.test.tsx
+# Run all tests
+npm run test:run
+
+# Run tests in watch mode
+npm run test
+
+# Run with coverage
+npm run test:coverage
 ```
 
----
+### Test Coverage
 
-## Commands
+| Category | Tests | Pass Rate |
+|----------|-------|-----------|
+| Unit Tests (date-utils) | 32 | 90.6% |
+| Integration Tests (RentalFlow) | 15 | 53.3% |
+| Edge Cases (imageService) | 10 | 100% |
 
-```bash
-npm run dev           # Development server
-npm run build         # Production build
-npm run lint          # ESLint
-npm run test:run      # Run all tests once
-npm run test          # Watch mode
+For detailed test documentation, see [docs/TESTING.md](docs/TESTING.md).
 
-# Python scripts (from scripts/)
-uv run setup_gcs.py          # Create + configure GCS bucket
-uv run generate_inventory.py # Populate imageURLs from Unsplash
-```
+## Documentation
 
----
+Comprehensive documentation is available in the `docs/` folder:
 
-## Categories
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/ARCHITECTURE.md) | System architecture, component hierarchy, data flow |
+| [Diagrams](docs/DIAGRAMS.md) | Mermaid diagrams (sequence, class, state machine) |
+| [Onboarding](docs/ONBOARDING.md) | Developer guide, debugging, adding categories |
+| [Testing](docs/TESTING.md) | Test suite documentation and results |
 
-| ID | Display Name |
-|----|-------------|
-| `fotografia-video` | Fotografía y Video |
-| `montana-camping` | Montaña y Camping |
-| `deportes-acuaticos` | Deportes Acuáticos |
+### Quick Links
 
----
+- **New Developer?** Start with the [Onboarding Guide](docs/ONBOARDING.md)
+- **Understanding the codebase?** See [Architecture](docs/ARCHITECTURE.md)
+- **Visual learner?** Check [Diagrams](docs/DIAGRAMS.md) for Mermaid diagrams
+- **Running tests?** Read [Testing](docs/TESTING.md)
 
-## Tech Stack
+### Key Diagrams
 
-- **Framework**: Next.js 16+ (App Router, Server Components)
-- **Styling**: Tailwind CSS v4 + shadcn/ui (Apple-inspired design)
-- **Validation**: Zod (env vars, API inputs, inventory schema)
-- **AI Images**: Nano Banana Pro (`gemini-3-pro-image-preview`)
-- **Storage**: Google Cloud Storage
-- **Testing**: Vitest + React Testing Library
-- **Scripts**: Python 3.11+ with `uv` and `python-dotenv`
+The [Diagrams](docs/DIAGRAMS.md) document includes:
+
+- **Image Resolution Flow**: Sequence diagram showing JSON → Nano Banana → GCS persistence
+- **Service Class Diagram**: inventoryService and imageService interactions
+- **Rental Flow State Machine**: Multi-step wizard state transitions
+- **Component Hierarchy**: React component tree
+- **Data Flow Diagram**: Request/response flow through layers
+
+## License
+
+MIT

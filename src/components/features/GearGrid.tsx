@@ -1,131 +1,159 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import { useState, useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { GearItem, CATEGORY_LABELS } from "@/lib/validation";
-import { GearImage } from "./GearImage";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatCurrency } from "@/lib/date-utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GearItem, CATEGORIES } from "@/lib/validation";
+import { formatPrice } from "@/lib/date-utils";
 
 interface GearGridProps {
   items: GearItem[];
   showSearch?: boolean;
+  showCategory?: boolean;
 }
 
-function GearCardSkeleton() {
-  return (
-    <div className="rounded-2xl border border-neutral-200 bg-white">
-      <div className="aspect-[4/3] animate-pulse rounded-t-2xl bg-neutral-200" />
-      <div className="p-4 space-y-2">
-        <div className="h-4 w-3/4 animate-pulse rounded bg-neutral-200" />
-        <div className="h-3 w-1/2 animate-pulse rounded bg-neutral-200" />
-        <div className="h-8 w-full animate-pulse rounded bg-neutral-200" />
-      </div>
-    </div>
-  );
-}
+export function GearGrid({
+  items,
+  showSearch = true,
+  showCategory = true,
+}: GearGridProps) {
+  const [searchQuery, setSearchQuery] = useState("");
 
-function GearCard({ item }: { item: GearItem }) {
-  return (
-    <Card className="group flex flex-col overflow-hidden">
-      <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
-        <GearImage
-          src={item.imageURL}
-          alt={item.name}
-          gearId={item.id}
-          className="h-full w-full"
-        />
-      </div>
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return items;
 
-      <CardContent className="flex flex-1 flex-col gap-2 pt-4">
-        <Badge variant="secondary" className="w-fit">
-          {CATEGORY_LABELS[item.category]}
-        </Badge>
-        <h3 className="font-semibold text-neutral-900 line-clamp-2 leading-snug">{item.name}</h3>
-        <p className="text-sm text-neutral-500 line-clamp-2 flex-1">{item.description}</p>
-
-        <div className="flex items-baseline gap-1">
-          <span className="text-xl font-bold text-neutral-900">
-            {formatCurrency(item.dailyRate)}
-          </span>
-          <span className="text-sm text-neutral-400">/ día</span>
-        </div>
-
-        {!item.available && (
-          <Badge variant="destructive" className="w-fit">
-            No disponible
-          </Badge>
-        )}
-      </CardContent>
-
-      <CardFooter>
-        <Button asChild className="w-full" disabled={!item.available}>
-          <Link href={`/gear/${item.id}`}>
-            {item.available ? "Ver detalles" : "No disponible"}
-          </Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
-
-export function GearGrid({ items, showSearch = false }: GearGridProps) {
-  const [query, setQuery] = useState("");
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return items;
-    const lower = query.toLowerCase();
+    const query = searchQuery.toLowerCase();
     return items.filter(
       (item) =>
-        item.name.toLowerCase().includes(lower) ||
-        item.description.toLowerCase().includes(lower)
+        item.name.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query)
     );
-  }, [items, query]);
+  }, [items, searchQuery]);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full">
       {showSearch && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <div className="relative max-w-md mx-auto mb-8">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            placeholder="Buscar equipos…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            type="search"
+            placeholder="Buscar equipo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-12 text-base"
           />
         </div>
       )}
 
-      {filtered.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-neutral-400">No se encontraron equipos para &ldquo;{query}&rdquo;.</p>
+      {filteredItems.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg">
+            No se encontró equipo que coincida con tu búsqueda.
+          </p>
         </div>
       ) : (
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <GearCardSkeleton key={i} />
-              ))}
-            </div>
-          }
-        >
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((item) => (
-              <GearCard key={item.id} item={item} />
-            ))}
-          </div>
-        </Suspense>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredItems.map((item) => (
+            <GearCard key={item.id} item={item} showCategory={showCategory} />
+          ))}
+        </div>
       )}
+    </div>
+  );
+}
 
-      <p className="text-sm text-neutral-400">
-        {filtered.length} equipo{filtered.length !== 1 ? "s" : ""}
-        {query ? ` para "${query}"` : ""}
-      </p>
+interface GearCardProps {
+  item: GearItem;
+  showCategory?: boolean;
+}
+
+function GearCard({ item, showCategory = true }: GearCardProps) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  return (
+    <Link href={`/gear/${item.id}`}>
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer h-full group">
+        <div className="relative aspect-[4/3] bg-neutral-100">
+          {item.imageURL && !imageError ? (
+            <>
+              {imageLoading && (
+                <Skeleton className="absolute inset-0" />
+              )}
+              <Image
+                src={item.imageURL}
+                alt={item.name}
+                fill
+                className={`object-cover transition-opacity duration-300 group-hover:scale-105 transition-transform ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                onLoad={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
+            </>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
+              <div className="text-center p-4">
+                <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-neutral-200 flex items-center justify-center">
+                  <span className="text-2xl">📷</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  Imagen no disponible
+                </span>
+              </div>
+            </div>
+          )}
+
+          {showCategory && (
+            <Badge variant="secondary" className="absolute top-3 left-3">
+              {CATEGORIES[item.category].name}
+            </Badge>
+          )}
+        </div>
+
+        <CardContent className="p-4">
+          <h3 className="font-semibold text-base line-clamp-1 group-hover:text-primary transition-colors">
+            {item.name}
+          </h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 mt-1 min-h-[40px]">
+            {item.description}
+          </p>
+          <div className="mt-3 flex items-baseline gap-1">
+            <span className="text-lg font-bold text-primary">
+              {formatPrice(item.dailyRate)}
+            </span>
+            <span className="text-sm text-muted-foreground">/día</span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+// Loading skeleton for the grid
+export function GearGridSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <Card key={i} className="overflow-hidden">
+          <Skeleton className="aspect-[4/3]" />
+          <CardContent className="p-4">
+            <Skeleton className="h-5 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-full mb-1" />
+            <Skeleton className="h-4 w-2/3 mb-3" />
+            <Skeleton className="h-6 w-1/3" />
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

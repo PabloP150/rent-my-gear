@@ -1,502 +1,652 @@
 [
   {
-    "id": "fv-001",
-    "name": "Sony A7 IV Mirrorless Camera",
+    "id": "gear-001",
+    "name": "Canon EOS R5",
     "category": "fotografia-video",
-    "description": "Cámara mirrorless de fotograma completo con sensor BSI CMOS de 33MP y video 4K.",
-    "dailyRate": 850,
-    "imageURL": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop",
-    "specs": { "Sensor": "33MP BSI CMOS", "Video": "4K 60fps", "ISO": "100-51200", "Estabilización": "5 ejes" },
-    "available": true
-  },
-  {
-    "id": "fv-002",
-    "name": "Canon EOS R5 Mirrorless Camera",
-    "category": "fotografia-video",
-    "description": "Cámara mirrorless profesional con sensor de 45MP y video 8K RAW.",
-    "dailyRate": 1100,
-    "imageURL": "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&auto=format&fit=crop",
-    "specs": { "Sensor": "45MP CMOS", "Video": "8K RAW", "ISO": "100-51200", "Ráfaga": "20fps" },
-    "available": true
-  },
-  {
-    "id": "fv-003",
-    "name": "DJI Ronin 4D Cinema Camera",
-    "category": "fotografia-video",
-    "description": "Sistema de cámara de cine con estabilizador integrado de 4 ejes y sensor LiDAR.",
-    "dailyRate": 2500,
-    "imageURL": "https://images.unsplash.com/photo-1632465394671-09b40f9d3aae?w=800&auto=format&fit=crop",
-    "specs": { "Sensor": "Full Frame", "Estabilizador": "4 ejes", "Enfoque": "LiDAR", "Video": "6K" },
-    "available": true
-  },
-  {
-    "id": "fv-004",
-    "name": "Sony 70-200mm f/2.8 GM II Lens",
-    "category": "fotografia-video",
-    "description": "Teleobjetivo profesional serie G Master con apertura constante f/2.8.",
-    "dailyRate": 450,
-    "imageURL": "https://images.unsplash.com/photo-1617005082133-548c4dd27f35?w=800&auto=format&fit=crop",
-    "specs": { "Focal": "70-200mm", "Apertura": "f/2.8", "Peso": "794g", "Montura": "Sony E" },
-    "available": true
-  },
-  {
-    "id": "fv-005",
-    "name": "DJI Mavic 3 Pro Drone",
-    "category": "fotografia-video",
-    "description": "Drone prosumer con triple cámara Hasselblad y hasta 43 minutos de vuelo.",
-    "dailyRate": 900,
-    "imageURL": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&auto=format&fit=crop",
-    "specs": { "Cámaras": "Triple Hasselblad", "Vuelo": "43 min", "Video": "5.1K", "Obstáculos": "Omnidireccional" },
-    "available": true
-  },
-  {
-    "id": "fv-006",
-    "name": "Aputure 600d Pro LED Light",
-    "category": "fotografia-video",
-    "description": "Luz LED de tungsteno de alta potencia con control Bluetooth y batería V-Mount.",
-    "dailyRate": 650,
-    "imageURL": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&auto=format&fit=crop",
-    "specs": { "Potencia": "600W", "Temperatura": "2700-6500K", "CRI": "96+", "Control": "Bluetooth" },
-    "available": true
-  },
-  {
-    "id": "fv-007",
-    "name": "Rode NTG5 Shotgun Microphone",
-    "category": "fotografia-video",
-    "description": "Micrófono de escopeta profesional ultraliviano con respuesta de frecuencia plana.",
-    "dailyRate": 250,
-    "imageURL": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop",
-    "specs": { "Tipo": "Shotgun", "Peso": "76g", "Respuesta": "20Hz-20kHz", "Alimentación": "Phantom 48V" },
-    "available": true
-  },
-  {
-    "id": "fv-008",
-    "name": "Blackmagic Pocket Cinema Camera 6K",
-    "category": "fotografia-video",
-    "description": "Cámara de cine compacta con sensor Super 35 y capacidad RAW 6K.",
-    "dailyRate": 1200,
-    "imageURL": "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&auto=format&fit=crop",
-    "specs": { "Sensor": "Super 35", "Video": "6K RAW", "Rango Dinámico": "13 stops", "Montura": "EF/PL" },
-    "available": true
-  },
-  {
-    "id": "fv-009",
-    "name": "Manfrotto Carbon Fiber Tripod",
-    "category": "fotografia-video",
-    "description": "Trípode de fibra de carbono profesional con cabeza fluida para video.",
-    "dailyRate": 180,
-    "imageURL": "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800&auto=format&fit=crop",
-    "specs": { "Material": "Fibra de carbono", "Carga máx.": "18kg", "Altura": "165cm", "Peso": "2.4kg" },
-    "available": true
-  },
-  {
-    "id": "fv-010",
-    "name": "Sigma 24-70mm f/2.8 Art Lens",
-    "category": "fotografia-video",
-    "description": "Lente zoom estándar de la serie Art con apertura constante f/2.8.",
-    "dailyRate": 320,
-    "imageURL": "https://images.unsplash.com/photo-1527090526205-beaac8dc3c62?w=800&auto=format&fit=crop",
-    "specs": { "Focal": "24-70mm", "Apertura": "f/2.8", "Diámetro filtro": "82mm", "Montura": "Canon EF/Nikon F/Sony E" },
-    "available": true
-  },
-  {
-    "id": "fv-011",
-    "name": "SmallRig Cage Kit for Sony A7",
-    "category": "fotografia-video",
-    "description": "Jaula de filmación completa para Sony A7 con manija superior y placa lateral.",
+    "description": "Cámara mirrorless full-frame profesional con grabación 8K",
+    "specs": {
+      "sensor": "45MP Full-Frame",
+      "video": "8K RAW",
+      "estabilización": "IBIS 8 stops"
+    },
     "dailyRate": 150,
-    "imageURL": "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&auto=format&fit=crop",
-    "specs": { "Compatibilidad": "Sony A7 Series", "Material": "Aluminio", "Incluye": "Manija, placa, tornillos", "Peso": "380g" },
-    "available": true
+    "imageURL": "https://images.unsplash.com/photo-1751107996077-aee030806ca5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW5vbiUyMGNhbWVyYSUyMHByb2Zlc3Npb25hbHxlbnwwfDB8fHwxNzY2NDEwNzYzfDA&ixlib=rb-4.1.0&q=80&w=1080"
   },
   {
-    "id": "fv-012",
-    "name": "Atomos Ninja V Monitor-Recorder",
+    "id": "gear-002",
+    "name": "Sony A7 IV",
     "category": "fotografia-video",
-    "description": "Monitor-grabador HDMI de 5 pulgadas con pantalla HDR y grabación ProRes RAW.",
-    "dailyRate": 350,
-    "imageURL": "https://images.unsplash.com/photo-1533228876829-65c94e7b5025?w=800&auto=format&fit=crop",
-    "specs": { "Pantalla": "5\" HDMI AtomHDR", "Grabación": "ProRes RAW", "Brillo": "1000 nits", "Alimentación": "NP-F550" },
-    "available": true
-  },
-  {
-    "id": "fv-013",
-    "name": "GoPro Hero 12 Black Action Camera",
-    "category": "fotografia-video",
-    "description": "Cámara de acción con Hypersmooth 6.0 y grabación 5.3K60 con HDR.",
-    "dailyRate": 220,
-    "imageURL": "https://images.unsplash.com/photo-1682686580391-615b1f28e5ee?w=800&auto=format&fit=crop",
-    "specs": { "Video": "5.3K60 HDR", "Estabilización": "HyperSmooth 6.0", "Resistencia": "10m agua", "Pantalla": "2.27\" táctil" },
-    "available": true
-  },
-  {
-    "id": "fv-014",
-    "name": "Profoto B10 Plus Flash",
-    "category": "fotografia-video",
-    "description": "Flash portátil de 500Ws con HSS y tiempo de recarga de 1.2 segundos.",
-    "dailyRate": 480,
-    "imageURL": "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=800&auto=format&fit=crop",
-    "specs": { "Potencia": "500Ws", "Recarga": "1.2s", "HSS": "Sí", "Batería": "Hasta 325 destellos" },
-    "available": false
-  },
-  {
-    "id": "fv-015",
-    "name": "Zhiyun Crane 4 Gimbal",
-    "category": "fotografia-video",
-    "description": "Estabilizador motorizado de 3 ejes con carga máxima de 3.2kg y pantalla OLED.",
-    "dailyRate": 380,
-    "imageURL": "https://images.unsplash.com/photo-1559163499-413811fb2344?w=800&auto=format&fit=crop",
-    "specs": { "Carga máx.": "3.2kg", "Ejes": "3", "Pantalla": "OLED", "Batería": "12h" },
-    "available": true
-  },
-  {
-    "id": "mc-001",
-    "name": "Black Diamond Aspect 60L Backpack",
-    "category": "montana-camping",
-    "description": "Mochila técnica de 60 litros con sistema de suspensión FlowVent y aro de hip belt.",
-    "dailyRate": 180,
-    "imageURL": "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=800&auto=format&fit=crop",
-    "specs": { "Volumen": "60L", "Peso": "1.76kg", "Suspensión": "FlowVent", "Material": "210D nylon" },
-    "available": true
-  },
-  {
-    "id": "mc-002",
-    "name": "Mammut Eigerjoch Pro Sleeping Bag",
-    "category": "montana-camping",
-    "description": "Saco de dormir de plumas -25°C certificado EN 13537, ideal para alta montaña.",
-    "dailyRate": 220,
-    "imageURL": "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&auto=format&fit=crop",
-    "specs": { "Temperatura": "-25°C / -40°C extrema", "Relleno": "Plumas 900 Fill", "Peso": "1.2kg", "Compresión": "3.5L" },
-    "available": true
-  },
-  {
-    "id": "mc-003",
-    "name": "MSR Hubba Hubba NX 2 Tent",
-    "category": "montana-camping",
-    "description": "Tienda de campaña ultraliviana para 2 personas con doble puerta y 2 vestíbulos.",
-    "dailyRate": 250,
-    "imageURL": "https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=800&auto=format&fit=crop",
-    "specs": { "Capacidad": "2 personas", "Peso": "1.72kg", "Estaciones": "3 temporadas", "Embalaje": "43x14cm" },
-    "available": true
-  },
-  {
-    "id": "mc-004",
-    "name": "Garmin inReach Mini 2 Satellite Communicator",
-    "category": "montana-camping",
-    "description": "Comunicador satelital bidireccional con SOS y rastreo GPS, sin zonas muertas.",
-    "dailyRate": 300,
-    "imageURL": "https://images.unsplash.com/photo-1590502593747-42a996133562?w=800&auto=format&fit=crop",
-    "specs": { "Red": "Iridium", "SOS": "24/7", "Batería": "14 días rastreo", "Peso": "100g" },
-    "available": true
-  },
-  {
-    "id": "mc-005",
-    "name": "Petzl Nomic Ice Axes (Par)",
-    "category": "montana-camping",
-    "description": "Par de piolets técnicos curvos para escalada en hielo y mixto.",
-    "dailyRate": 280,
-    "imageURL": "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&auto=format&fit=crop",
-    "specs": { "Tipo": "Técnico curvo", "Longitud": "52cm", "Pico": "Acero inoxidable", "Empuñadura": "Ergonómica" },
-    "available": true
-  },
-  {
-    "id": "mc-006",
-    "name": "Scarpa Phantom 6000 Mountaineering Boots",
-    "category": "montana-camping",
-    "description": "Botas de alpinismo de doble capa certificadas para -40°C.",
-    "dailyRate": 350,
-    "imageURL": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop",
-    "specs": { "Temperatura": "-40°C", "Tallas": "39-48", "Suela": "Vibram Arctic Grip", "Sistema": "Doble capa" },
-    "available": true
-  },
-  {
-    "id": "mc-007",
-    "name": "Jetboil Flash Cooking System",
-    "category": "montana-camping",
-    "description": "Sistema de cocina ultrarrápido que hierve 500ml en 100 segundos.",
+    "description": "Cámara mirrorless híbrida para foto y video",
+    "specs": {
+      "sensor": "33MP Full-Frame",
+      "video": "4K 60fps",
+      "autofocus": "759 puntos"
+    },
     "dailyRate": 120,
-    "imageURL": "https://images.unsplash.com/photo-1563299796-17596ed6b017?w=800&auto=format&fit=crop",
-    "specs": { "Ebullición": "100 segundos", "Volumen": "1L", "Peso": "371g", "Combustible": "Isobutano-propano" },
-    "available": true
+    "imageURL": "https://images.unsplash.com/photo-1642396947866-8940587121c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzb255JTIwbWlycm9ybGVzcyUyMGNhbWVyYXxlbnwwfDB8fHwxNzY2NDEwNzY0fDA&ixlib=rb-4.1.0&q=80&w=1080"
   },
   {
-    "id": "mc-008",
-    "name": "Black Diamond Vapor Helmet",
-    "category": "montana-camping",
-    "description": "Casco de escalada ultraliviano con ventilación activa y foam EPS.",
-    "dailyRate": 80,
-    "imageURL": "https://images.unsplash.com/photo-1495376479098-3a54e9f02b7e?w=800&auto=format&fit=crop",
-    "specs": { "Peso": "175g", "Ventilación": "Activa", "Certificación": "EN 12492 / UIAA 106", "Tallas": "S/M, L/XL" },
-    "available": true
-  },
-  {
-    "id": "mc-009",
-    "name": "Petzl Grigri+ Belay Device",
-    "category": "montana-camping",
-    "description": "Asegurador asistido con función anti-pánico y compatible con cuerda simple.",
-    "dailyRate": 60,
-    "imageURL": "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&auto=format&fit=crop",
-    "specs": { "Tipo": "Asistido", "Cuerdas": "8.5-11mm", "Función": "Anti-pánico", "Peso": "200g" },
-    "available": true
-  },
-  {
-    "id": "mc-010",
-    "name": "Mammut 9.5 Crag Dry Rope 60m",
-    "category": "montana-camping",
-    "description": "Cuerda de escalada dinámica tratamiento Dry con 60 metros y certificación UIAA.",
-    "dailyRate": 150,
-    "imageURL": "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=800&auto=format&fit=crop",
-    "specs": { "Diámetro": "9.5mm", "Longitud": "60m", "Tratamiento": "Dry", "Certificación": "CE / UIAA" },
-    "available": true
-  },
-  {
-    "id": "mc-011",
-    "name": "MSR Revo Explore Snowshoes",
-    "category": "montana-camping",
-    "description": "Raquetas de nieve técnicas con Ergo Televator y crampones flotantes.",
-    "dailyRate": 140,
-    "imageURL": "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800&auto=format&fit=crop",
-    "specs": { "Material": "Aluminio 6000", "Talla": "22\"-25\"", "Crampones": "Flotantes", "Carga máx.": "113kg" },
-    "available": true
-  },
-  {
-    "id": "mc-012",
-    "name": "Nemo Tensor Ultralight Sleeping Pad",
-    "category": "montana-camping",
-    "description": "Colchoneta inflable ultraliviana con valor R de 3.5 y sistema Spaceframe.",
-    "dailyRate": 90,
-    "imageURL": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop",
-    "specs": { "Valor R": "3.5", "Peso": "350g", "Dimensiones": "183x51cm", "Grosor": "7.6cm" },
-    "available": true
-  },
-  {
-    "id": "mc-013",
-    "name": "Garmin Fenix 7X Solar GPS Watch",
-    "category": "montana-camping",
-    "description": "Reloj GPS multideporte con carga solar y batería de 28 días en modo smartwatch.",
-    "dailyRate": 200,
-    "imageURL": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop",
-    "specs": { "GPS": "Multi-banda", "Batería": "28 días", "Carga": "Solar", "Certificación": "MIL-STD-810" },
-    "available": true
-  },
-  {
-    "id": "mc-014",
-    "name": "Black Diamond Spot 400 Headlamp",
-    "category": "montana-camping",
-    "description": "Linterna frontal de 400 lúmenes con modo de visión nocturna rojo y resistencia IPX8.",
-    "dailyRate": 50,
-    "imageURL": "https://images.unsplash.com/photo-1565814636199-ae8133055c1c?w=800&auto=format&fit=crop",
-    "specs": { "Lúmenes": "400", "IPX": "8", "Baterías": "3x AAA", "Peso": "95g" },
-    "available": true
-  },
-  {
-    "id": "mc-015",
-    "name": "Therm-a-Rest NeoAir XTherm Sleeping Pad",
-    "category": "montana-camping",
-    "description": "Colchoneta inflable de 4 estaciones con valor R de 7.3 y tecnología ThermaCapture.",
-    "dailyRate": 110,
-    "imageURL": "https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=800&auto=format&fit=crop",
-    "specs": { "Valor R": "7.3", "Peso": "430g", "Tecnología": "ThermaCapture", "Tamaño plegado": "28x14cm" },
-    "available": true
-  },
-  {
-    "id": "mc-016",
-    "name": "Rab Neutrino Pro Down Jacket",
-    "category": "montana-camping",
-    "description": "Chaqueta de plumas 800FP con tratamiento Nikwax Hydrophobic Down para montaña.",
-    "dailyRate": 160,
-    "imageURL": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop",
-    "specs": { "Relleno": "800FP Hydrophobic Down", "Peso": "385g", "Temperatura": "-15°C activo", "Tratamiento": "Nikwax" },
-    "available": false
-  },
-  {
-    "id": "mc-017",
-    "name": "Kahtoola Microspikes Traction System",
-    "category": "montana-camping",
-    "description": "Crampones ligeros de 10 dientes para hielo y nieve compacta, universales.",
-    "dailyRate": 70,
-    "imageURL": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop",
-    "specs": { "Dientes": "10 acero inox.", "Tallas": "S, M, L, XL", "Peso par": "510g", "Compatible": "Cualquier calzado" },
-    "available": true
-  },
-  {
-    "id": "da-001",
-    "name": "Cressi Leonidas 5mm Wetsuit",
-    "category": "deportes-acuaticos",
-    "description": "Traje de neopreno de 5mm para buceo y snorkel en aguas frías con cremallera dorsal.",
-    "dailyRate": 180,
-    "imageURL": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop",
-    "specs": { "Grosor": "5mm", "Material": "Neopreno CR", "Cierre": "Dorsal YKK", "Tallas": "XS-XXL" },
-    "available": true
-  },
-  {
-    "id": "da-002",
-    "name": "Aqua Lung i750TC Dive Computer",
-    "category": "deportes-acuaticos",
-    "description": "Computadora de buceo con boussole integrada, altura y algoritmo Pelagic Z+.",
-    "dailyRate": 250,
-    "imageURL": "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=800&auto=format&fit=crop",
-    "specs": { "Algoritmo": "Pelagic Z+", "Brújula": "Integrada", "Pantalla": "Color 2.2\"", "Buceos": "99 registros" },
-    "available": true
-  },
-  {
-    "id": "da-003",
-    "name": "Mares Instinct BCD Jacket",
-    "category": "deportes-acuaticos",
-    "description": "Chaleco de control de flotabilidad integrado con sistema de drenaje SXT2.",
-    "dailyRate": 200,
-    "imageURL": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&auto=format&fit=crop",
-    "specs": { "Tipo": "Jacket", "Sistema": "SXT2 drenaje", "Peso": "3.2kg", "Tallas": "XS-XL" },
-    "available": true
-  },
-  {
-    "id": "da-004",
-    "name": "Scubapro MK25 EVO / A700 Regulator",
-    "category": "deportes-acuaticos",
-    "description": "Regulador de primera y segunda etapa de alto rendimiento con pneumatically balanced.",
-    "dailyRate": 320,
-    "imageURL": "https://images.unsplash.com/photo-1559628233-100c798642d0?w=800&auto=format&fit=crop",
-    "specs": { "Primera etapa": "MK25 EVO DIN/INT", "Segunda etapa": "A700", "Certificación": "EN250A", "Temperatura": "Agua fría" },
-    "available": true
-  },
-  {
-    "id": "da-005",
-    "name": "Hobie Mirage Pro Angler Kayak 14",
-    "category": "deportes-acuaticos",
-    "description": "Kayak de pesca con pedales MirageDrive 360 y capacidad de carga de 200kg.",
-    "dailyRate": 750,
-    "imageURL": "https://images.unsplash.com/photo-1472745433479-4556f22e32c2?w=800&auto=format&fit=crop",
-    "specs": { "Longitud": "4.27m", "Capacidad": "200kg", "Propulsión": "Pedal MirageDrive 360", "Peso": "60kg" },
-    "available": true
-  },
-  {
-    "id": "da-006",
-    "name": "Red Paddle Co 11'0 Sport SUP",
-    "category": "deportes-acuaticos",
-    "description": "Tabla de paddle surf inflable con tecnología MSL Fusion para máxima rigidez.",
-    "dailyRate": 420,
-    "imageURL": "https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=800&auto=format&fit=crop",
-    "specs": { "Longitud": "335cm", "Ancho": "79cm", "Tecnología": "MSL Fusion", "Peso": "8.8kg" },
-    "available": true
-  },
-  {
-    "id": "da-007",
-    "name": "Rip Curl E-Bomb 3/2mm Springsuit",
-    "category": "deportes-acuaticos",
-    "description": "Traje de surf primaverals de 3mm con forro E7 Flash y construcción E6 Glue.",
-    "dailyRate": 120,
-    "imageURL": "https://images.unsplash.com/photo-1455264745730-cb3b76250dd8?w=800&auto=format&fit=crop",
-    "specs": { "Grosor": "3/2mm", "Forro": "E7 Flash", "Construcción": "E6 Glue", "Tipo": "Springsuit" },
-    "available": true
-  },
-  {
-    "id": "da-008",
-    "name": "Starboard Foil Carbon Board",
-    "category": "deportes-acuaticos",
-    "description": "Tabla de foil de carbono para windsurf y kitesurf con mástil de 90cm.",
-    "dailyRate": 550,
-    "imageURL": "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=800&auto=format&fit=crop",
-    "specs": { "Material": "Carbon sandwich", "Mástil": "90cm aluminio", "Ala": "1800cm²", "Peso": "4.5kg" },
-    "available": true
-  },
-  {
-    "id": "da-009",
-    "name": "Ocean Kayak Scrambler Sit-on-Top",
-    "category": "deportes-acuaticos",
-    "description": "Kayak sit-on-top estable para surf y bahías con sistema Comfort Tech.",
-    "dailyRate": 280,
-    "imageURL": "https://images.unsplash.com/photo-1509005084666-3cbc75184cbb?w=800&auto=format&fit=crop",
-    "specs": { "Longitud": "3.05m", "Capacidad": "136kg", "Asiento": "Comfort Tech", "Peso": "18kg" },
-    "available": true
-  },
-  {
-    "id": "da-010",
-    "name": "Naish Pivot Kiteboard 2024",
-    "category": "deportes-acuaticos",
-    "description": "Tabla de kitesurf twin-tip con canales de velocidad y groove inserts.",
-    "dailyRate": 380,
-    "imageURL": "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=800&auto=format&fit=crop",
-    "specs": { "Longitud": "138cm", "Ancho": "41.5cm", "Tipo": "Twin-tip", "Pads": "Groove binding" },
-    "available": true
-  },
-  {
-    "id": "da-011",
-    "name": "Garmin Descent Mk3i Dive Computer",
-    "category": "deportes-acuaticos",
-    "description": "Reloj de buceo multideporte con GPS de superficie y hasta 80m de profundidad.",
-    "dailyRate": 350,
-    "imageURL": null,
-    "specs": { "Profundidad máx.": "80m", "GPS": "Superficie", "Modos": "Aire, Nitrox, Trimix, CCR", "Batería": "22h GPS" },
-    "available": true
-  },
-  {
-    "id": "da-012",
-    "name": "Mares Razor Pro Fins",
-    "category": "deportes-acuaticos",
-    "description": "Aletas de buceo de bolsillo abierto con canales de agua y punta bi-material.",
-    "dailyRate": 80,
-    "imageURL": null,
-    "specs": { "Material": "Thermoplastic", "Punta": "Bi-material", "Canales": "3 agua", "Tallas": "XS-XL" },
-    "available": true
-  },
-  {
-    "id": "da-013",
-    "name": "Sealine X2 Dry Bag 30L",
-    "category": "deportes-acuaticos",
-    "description": "Bolsa seca de 30L con sellado de rodillo triple y correa acolchada.",
-    "dailyRate": 60,
-    "imageURL": null,
-    "specs": { "Volumen": "30L", "Sellado": "Triple rodillo", "Resistencia": "IPX4", "Correa": "Acolchada ajustable" },
-    "available": true
-  },
-  {
-    "id": "mc-018",
-    "name": "Osprey Atmos AG 65 Backpack",
-    "category": "montana-camping",
-    "description": "Mochila de senderismo con sistema Anti-Gravity suspensión y bolsillo hipbelt.",
-    "dailyRate": 160,
-    "imageURL": null,
-    "specs": { "Volumen": "65L", "Suspensión": "Anti-Gravity", "Tallas": "S/M, M/L", "Peso": "1.98kg" },
-    "available": true
-  },
-  {
-    "id": "fv-018",
-    "name": "Nanlite Pavotube II 15C LED Tube",
+    "id": "gear-003",
+    "name": "DJI Ronin RS3 Pro",
     "category": "fotografia-video",
-    "description": "Tubo LED RGBWW de 2 pies con temperatura 2700-6500K y aplicación móvil.",
-    "dailyRate": 190,
-    "imageURL": null,
-    "specs": { "Longitud": "60cm", "Color": "RGBWW 2700-6500K", "Control": "App NanLink", "Batería": "Interna 50min" },
-    "available": true
-  },
-  {
-    "id": "mc-019",
-    "name": "Platypus GravityWorks 4L Water Filter",
-    "category": "montana-camping",
-    "description": "Sistema de filtración por gravedad de 4 litros con filtro hollow-fiber de 0.2 micras.",
+    "description": "Estabilizador gimbal profesional para cámaras cinema",
+    "specs": {
+      "carga": "4.5kg",
+      "autonomía": "12h",
+      "transmisión": "LiDAR"
+    },
     "dailyRate": 75,
-    "imageURL": null,
-    "specs": { "Capacidad": "4L", "Filtro": "Hollow-fiber 0.2μm", "Flujo": "1.75L/min", "Peso": "282g" },
-    "available": true
+    "imageURL": "https://images.unsplash.com/photo-1633794088922-4d882e14feba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW1lcmElMjBnaW1iYWwlMjBzdGFiaWxpemVyfGVufDB8MHx8fDE3NjY0MTA3NjR8MA&ixlib=rb-4.1.0&q=80&w=1080"
   },
   {
-    "id": "da-014",
-    "name": "Body Glove Inflatable Paddleboard 10'6\"",
-    "category": "deportes-acuaticos",
-    "description": "Tabla de paddle surf inflable para principiantes con remo ajustable y bomba.",
-    "dailyRate": 300,
-    "imageURL": null,
-    "specs": { "Longitud": "320cm", "Ancho": "81cm", "Grosor": "15cm", "Capacidad": "120kg" },
-    "available": true
+    "id": "gear-004",
+    "name": "Sony FX6",
+    "category": "fotografia-video",
+    "description": "Cámara de cine compacta full-frame",
+    "specs": {
+      "sensor": "10.2MP Full-Frame",
+      "video": "4K 120fps",
+      "ISO": "hasta 409600"
+    },
+    "dailyRate": 250,
+    "imageURL": "https://images.unsplash.com/photo-1762028895705-1be7ca2506c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjaW5lbWElMjBjYW1lcmElMjBwcm9mZXNzaW9uYWx8ZW58MHwwfHx8MTc2NjQxMDc2NXww&ixlib=rb-4.1.0&q=80&w=1080"
   },
   {
-    "id": "da-015",
-    "name": "Liquid Force Trip 12m Kite",
+    "id": "gear-005",
+    "name": "Aputure 600d Pro",
+    "category": "fotografia-video",
+    "description": "Luz LED daylight profesional para cine",
+    "specs": {
+      "potencia": "600W",
+      "temperatura": "5600K",
+      "CRI": "96+"
+    },
+    "dailyRate": 85,
+    "imageURL": "https://images.unsplash.com/photo-1668453814676-c8093305fae6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzdHVkaW8lMjBsaWdodCUyMHByb2Zlc3Npb25hbHxlbnwwfDB8fHwxNzY2NDEwNzY2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-006",
+    "name": "Canon RF 70-200mm f/2.8L",
+    "category": "fotografia-video",
+    "description": "Teleobjetivo zoom profesional para RF mount",
+    "specs": {
+      "apertura": "f/2.8",
+      "estabilización": "5 stops",
+      "peso": "1070g"
+    },
+    "dailyRate": 65,
+    "imageURL": "https://images.unsplash.com/photo-1758506149291-4ceb41b1fab0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx0ZWxlcGhvdG8lMjBsZW5zJTIwY2FtZXJhfGVufDB8MHx8fDE3NjY0MTA3Njd8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-007",
+    "name": "DJI Mavic 3 Cine",
+    "category": "fotografia-video",
+    "description": "Drone profesional con cámara Hasselblad",
+    "specs": {
+      "sensor": "4/3 CMOS",
+      "video": "5.1K",
+      "vuelo": "46 min"
+    },
+    "dailyRate": 180,
+    "imageURL": "https://images.unsplash.com/photo-1760638346074-e65e53d31e78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBkcm9uZSUyMGFlcmlhbHxlbnwwfDB8fHwxNzY2NDEwNzY4fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-008",
+    "name": "Sennheiser MKH 416",
+    "category": "fotografia-video",
+    "description": "Micrófono shotgun de referencia para cine",
+    "specs": {
+      "patrón": "Super-cardioide",
+      "respuesta": "40Hz-20kHz",
+      "ruido": "13dB-A"
+    },
+    "dailyRate": 45,
+    "imageURL": "https://images.unsplash.com/photo-1650513737281-882e597ee5e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzaG90Z3VuJTIwbWljcm9waG9uZSUyMHByb2Zlc3Npb25hbHxlbnwwfDB8fHwxNzY2NDEwNzY5fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-009",
+    "name": "Blackmagic URSA Mini Pro 12K",
+    "category": "fotografia-video",
+    "description": "Cámara de cine digital 12K con Super 35",
+    "specs": {
+      "resolución": "12K",
+      "sensor": "Super 35",
+      "dinámica": "14 stops"
+    },
+    "dailyRate": 350,
+    "imageURL": "https://images.unsplash.com/photo-1614885363183-9e7ff8d85ac5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxibGFja21hZ2ljJTIwY2luZW1hJTIwY2FtZXJhfGVufDB8MHx8fDE3NjY0MTA3NzB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-010",
+    "name": "Godox AD600 Pro",
+    "category": "fotografia-video",
+    "description": "Flash estroboscópico portátil de alta potencia",
+    "specs": {
+      "potencia": "600Ws",
+      "TTL": "Sí",
+      "HSS": "1/8000s"
+    },
+    "dailyRate": 55,
+    "imageURL": "https://images.unsplash.com/photo-1543801072-3527b895bfef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxmbGFzaCUyMHN0cm9iZSUyMHBob3RvZ3JhcGh5fGVufDB8MHx8fDE3NjY0MTA3NzF8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-011",
+    "name": "Atomos Ninja V+",
+    "category": "fotografia-video",
+    "description": "Monitor grabador 5\" con ProRes RAW",
+    "specs": {
+      "pantalla": "5.2\" HDR",
+      "grabación": "8K ProRes RAW",
+      "brillo": "1000 nits"
+    },
+    "dailyRate": 70,
+    "imageURL": "https://images.unsplash.com/photo-1613378249465-7974844166a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx2aWRlbyUyMG1vbml0b3IlMjByZWNvcmRlcnxlbnwwfDB8fHwxNzY2NDEwNzcyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-012",
+    "name": "Sigma 24-70mm f/2.8 DG DN Art",
+    "category": "fotografia-video",
+    "description": "Zoom estándar premium para mirrorless",
+    "specs": {
+      "apertura": "f/2.8",
+      "construcción": "19 elementos",
+      "peso": "830g"
+    },
+    "dailyRate": 50,
+    "imageURL": "https://images.unsplash.com/photo-1662244878896-5183159190d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW1lcmElMjBsZW5zJTIwem9vbXxlbnwwfDB8fHwxNzY2NDEwNzczfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-013",
+    "name": "Profoto B10X Plus",
+    "category": "fotografia-video",
+    "description": "Flash de estudio portátil premium",
+    "specs": {
+      "potencia": "500Ws",
+      "TTL": "Sí",
+      "autonomía": "400 disparos"
+    },
+    "dailyRate": 90,
+    "imageURL": "https://images.unsplash.com/photo-1583399886530-1a33f9e72d30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzdHVkaW8lMjBmbGFzaCUyMHByb2ZvdG98ZW58MHwwfHx8MTc2NjQxMDc3NHww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-014",
+    "name": "Zhiyun Crane 4",
+    "category": "fotografia-video",
+    "description": "Gimbal compacto para cámaras mirrorless",
+    "specs": {
+      "carga": "6kg",
+      "autonomía": "14h",
+      "pantalla": "OLED táctil"
+    },
+    "dailyRate": 60,
+    "imageURL": "https://images.unsplash.com/photo-1564328773404-e7f3d5be4717?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxnaW1iYWwlMjBzdGFiaWxpemVyJTIwdmlkZW98ZW58MHwwfHx8MTc2NjQxMDc3NXww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-015",
+    "name": "Rode NTG5",
+    "category": "fotografia-video",
+    "description": "Micrófono shotgun broadcast ligero",
+    "specs": {
+      "patrón": "Supercardioide",
+      "peso": "76g",
+      "respuesta": "20Hz-20kHz"
+    },
+    "dailyRate": 40,
+    "imageURL": "https://images.unsplash.com/photo-1659083726032-32d67d08ba64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxtaWNyb3Bob25lJTIwcmVjb3JkaW5nJTIwYm9vbXxlbnwwfDB8fHwxNzY2NDEwNzc2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-016",
+    "name": "SmallRig Video Kit",
+    "category": "fotografia-video",
+    "description": "Kit de jaula y accesorios para video",
+    "specs": {
+      "compatibilidad": "Universal",
+      "material": "Aluminio",
+      "peso": "450g"
+    },
+    "dailyRate": 25,
+    "imageURL": "https://storage.googleapis.com/rent-my-gear-pictures/gear-images/gear-016-1766411339561-cc3j9i.png"
+  },
+  {
+    "id": "gear-017",
+    "name": "Tilta Nucleus-M",
+    "category": "fotografia-video",
+    "description": "Sistema de follow focus inalámbrico",
+    "specs": {
+      "alcance": "100m",
+      "motores": "2",
+      "batería": "8h"
+    },
+    "dailyRate": 95,
+    "imageURL": "https://storage.googleapis.com/rent-my-gear-pictures/gear-images/gear-017-1766411506687-ct5l7c.png"
+  },
+  {
+    "id": "gear-018",
+    "name": "Tienda MSR Hubba Hubba NX 2",
+    "category": "montana-camping",
+    "description": "Tienda ultraligera 2 personas para trekking",
+    "specs": {
+      "peso": "1.54kg",
+      "capacidad": "2 personas",
+      "estaciones": "3"
+    },
+    "dailyRate": 35,
+    "imageURL": "https://images.unsplash.com/photo-1727640826445-1672a9c4da75?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW1waW5nJTIwdGVudCUyMG1vdW50YWlufGVufDB8MHx8fDE3NjY0MTA3Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-019",
+    "name": "Saco Thermarest Hyperion 20",
+    "category": "montana-camping",
+    "description": "Saco de dormir ultraligero con plumón 900FP",
+    "specs": {
+      "temperatura": "-6°C",
+      "peso": "680g",
+      "relleno": "Plumón 900FP"
+    },
+    "dailyRate": 28,
+    "imageURL": "https://images.unsplash.com/photo-1560200772-7c2e2b07ac94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzbGVlcGluZyUyMGJhZyUyMGhpa2luZ3xlbnwwfDB8fHwxNzY2NDEwNzc4fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-020",
+    "name": "Mochila Osprey Atmos AG 65",
+    "category": "montana-camping",
+    "description": "Mochila de trekking con sistema AntiGravity",
+    "specs": {
+      "capacidad": "65L",
+      "peso": "2.18kg",
+      "espalda": "AntiGravity"
+    },
+    "dailyRate": 22,
+    "imageURL": "https://images.unsplash.com/photo-1623390003557-6614bd4997ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxoaWtpbmclMjBiYWNrcGFjayUyMG9zcHJleXxlbnwwfDB8fHwxNzY2NDEwNzgwfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-021",
+    "name": "Bastones Black Diamond Alpine Carbon Cork",
+    "category": "montana-camping",
+    "description": "Bastones de trekking ultraligeros de carbono",
+    "specs": {
+      "material": "Carbono",
+      "peso": "490g/par",
+      "ajuste": "FlickLock Pro"
+    },
+    "dailyRate": 12,
+    "imageURL": "https://images.unsplash.com/photo-1662109141645-55e2c004acff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx0cmVra2luZyUyMHBvbGVzJTIwaGlraW5nfGVufDB8MHx8fDE3NjY0MTA3ODF8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-022",
+    "name": "Hornillo MSR WindBurner",
+    "category": "montana-camping",
+    "description": "Sistema de cocina integrado a prueba de viento",
+    "specs": {
+      "potencia": "7000BTU",
+      "tiempo": "4.5min/1L",
+      "peso": "432g"
+    },
+    "dailyRate": 15,
+    "imageURL": "https://images.unsplash.com/photo-1624464313271-4f6f86599d67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW1waW5nJTIwc3RvdmUlMjBjb29raW5nfGVufDB8MHx8fDE3NjY0MTA3ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-023",
+    "name": "Colchoneta Sea to Summit Ether Light XT",
+    "category": "montana-camping",
+    "description": "Colchoneta inflable ultraligera con R-Value 3.2",
+    "specs": {
+      "R-Value": "3.2",
+      "peso": "425g",
+      "grosor": "10cm"
+    },
+    "dailyRate": 18,
+    "imageURL": "https://images.unsplash.com/photo-1708105559945-ad5d6612c78c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzbGVlcGluZyUyMHBhZCUyMGNhbXBpbmd8ZW58MHwwfHx8MTc2NjQxMDc4M3ww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-024",
+    "name": "Linterna Petzl NAO RL",
+    "category": "montana-camping",
+    "description": "Linterna frontal reactiva de alto rendimiento",
+    "specs": {
+      "lúmenes": "1500",
+      "autonomía": "15h",
+      "peso": "145g"
+    },
+    "dailyRate": 10,
+    "imageURL": "https://images.unsplash.com/photo-1704690879917-c882776c0c1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxoZWFkbGFtcCUyMGhpa2luZyUyMG5pZ2h0fGVufDB8MHx8fDE3NjY0MTA3ODR8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-025",
+    "name": "Filtro Katadyn BeFree 1L",
+    "category": "montana-camping",
+    "description": "Filtro de agua ultraligero para trekking",
+    "specs": {
+      "capacidad": "1L",
+      "flujo": "2L/min",
+      "peso": "59g"
+    },
+    "dailyRate": 8,
+    "imageURL": "https://images.unsplash.com/photo-1607104429211-a44db396f07a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx3YXRlciUyMGZpbHRlciUyMGNhbXBpbmd8ZW58MHwwfHx8MTc2NjQxMDc4NXww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-026",
+    "name": "Crampones Petzl Irvis Hybrid",
+    "category": "montana-camping",
+    "description": "Crampones técnicos para alpinismo",
+    "specs": {
+      "puntas": "10",
+      "fijación": "Hybrid",
+      "peso": "725g/par"
+    },
+    "dailyRate": 20,
+    "imageURL": "https://images.unsplash.com/photo-1701732375295-c3397d38d26b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjcmFtcG9ucyUyMG1vdW50YWluZWVyaW5nJTIwaWNlfGVufDB8MHx8fDE3NjY0MTA3ODZ8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-027",
+    "name": "Piolet Petzl Summit Evo",
+    "category": "montana-camping",
+    "description": "Piolet técnico para alpinismo clásico",
+    "specs": {
+      "longitud": "59cm",
+      "peso": "315g",
+      "material": "Acero/Aluminio"
+    },
+    "dailyRate": 15,
+    "imageURL": "https://images.unsplash.com/photo-1534155483015-d9a921729d64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxpY2UlMjBheGUlMjBtb3VudGFpbmVlcmluZ3xlbnwwfDB8fHwxNzY2NDEwNzg3fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-028",
+    "name": "GPS Garmin inReach Mini 2",
+    "category": "montana-camping",
+    "description": "Comunicador satelital con GPS y SOS",
+    "specs": {
+      "conectividad": "Satélite Iridium",
+      "autonomía": "14 días",
+      "peso": "100g"
+    },
+    "dailyRate": 25,
+    "imageURL": "https://images.unsplash.com/photo-1647515994850-d2fe63dd580c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxncHMlMjBzYXRlbGxpdGUlMjBoaWtpbmd8ZW58MHwwfHx8MTc2NjQxMDc4OHww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-029",
+    "name": "Arnés Petzl Sitta",
+    "category": "montana-camping",
+    "description": "Arnés ultraligero para escalada y alpinismo",
+    "specs": {
+      "peso": "270g",
+      "tipo": "Regulable",
+      "certificación": "CE EN 12277"
+    },
+    "dailyRate": 12,
+    "imageURL": "https://images.unsplash.com/photo-1759928222798-63e73f690563?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjbGltYmluZyUyMGhhcm5lc3MlMjByb2NrfGVufDB8MHx8fDE3NjY0MTA3ODl8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-030",
+    "name": "Cuerda Beal Joker 9.1mm 60m",
+    "category": "montana-camping",
+    "description": "Cuerda dinámica unicore para escalada deportiva",
+    "specs": {
+      "diámetro": "9.1mm",
+      "longitud": "60m",
+      "peso": "54g/m"
+    },
+    "dailyRate": 18,
+    "imageURL": "https://images.unsplash.com/photo-1586685256769-4e869a64f1eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjbGltYmluZyUyMHJvcGUlMjBkeW5hbWljfGVufDB8MHx8fDE3NjY0MTA3OTB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-031",
+    "name": "Casco Petzl Meteor",
+    "category": "montana-camping",
+    "description": "Casco híbrido ligero para escalada y alpinismo",
+    "specs": {
+      "peso": "240g",
+      "certificación": "CE EN 12492",
+      "ventilación": "Sí"
+    },
+    "dailyRate": 10,
+    "imageURL": null
+  },
+  {
+    "id": "gear-032",
+    "name": "Tienda Hilleberg Nallo 2 GT",
+    "category": "montana-camping",
+    "description": "Tienda 4 estaciones para condiciones extremas",
+    "specs": {
+      "peso": "2.4kg",
+      "capacidad": "2 personas",
+      "estaciones": "4"
+    },
+    "dailyRate": 55,
+    "imageURL": null
+  },
+  {
+    "id": "gear-033",
+    "name": "Mochila Hyperlite Mountain Gear 3400",
+    "category": "montana-camping",
+    "description": "Mochila ultraligera de Dyneema",
+    "specs": {
+      "capacidad": "55L",
+      "peso": "879g",
+      "material": "Dyneema"
+    },
+    "dailyRate": 30,
+    "imageURL": "https://images.unsplash.com/photo-1623390003557-6614bd4997ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx1bHRyYWxpZ2h0JTIwYmFja3BhY2slMjBoaWtpbmd8ZW58MHwwfHx8MTc2NjQxMDc5MXww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-034",
+    "name": "Kit de Cocina Snow Peak Trek 900",
+    "category": "montana-camping",
+    "description": "Set de cocina compacto de titanio",
+    "specs": {
+      "material": "Titanio",
+      "capacidad": "900ml",
+      "peso": "175g"
+    },
+    "dailyRate": 14,
+    "imageURL": "https://images.unsplash.com/photo-1713980057164-4384aae9d15e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxjYW1waW5nJTIwY29va3dhcmUlMjB0aXRhbml1bXxlbnwwfDB8fHwxNzY2NDEwNzkyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-035",
+    "name": "Tabla SUP Red Paddle Voyager 12'6\"",
     "category": "deportes-acuaticos",
-    "description": "Cometa de kitesurf 12m con forma delta-C para freeride y waves.",
-    "dailyRate": 460,
-    "imageURL": null,
-    "specs": { "Tamaño": "12m²", "Forma": "Delta-C", "Barras": "Sensor Bar 22m", "Viento ideal": "15-25 nudos" },
-    "available": true
+    "description": "Paddle board inflable touring premium",
+    "specs": {
+      "longitud": "12'6\"",
+      "capacidad": "150kg",
+      "peso": "11.5kg"
+    },
+    "dailyRate": 45,
+    "imageURL": "https://images.unsplash.com/photo-1731707485070-dbf45803f3b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxwYWRkbGUlMjBib2FyZCUyMHN1cCUyMHdhdGVyfGVufDB8MHx8fDE3NjY0MTA3OTN8MA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-036",
+    "name": "Kayak Hobie Mirage Compass",
+    "category": "deportes-acuaticos",
+    "description": "Kayak con sistema de pedales MirageDrive",
+    "specs": {
+      "longitud": "12'",
+      "capacidad": "180kg",
+      "propulsión": "MirageDrive GT"
+    },
+    "dailyRate": 85,
+    "imageURL": "https://images.unsplash.com/photo-1764182160030-f274751838a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxrYXlhayUyMGZpc2hpbmclMjBzcG9ydHxlbnwwfDB8fHwxNzY2NDEwNzk0fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-037",
+    "name": "Traje Seco Kokatat Gore-Tex",
+    "category": "deportes-acuaticos",
+    "description": "Traje seco profesional para kayak y rafting",
+    "specs": {
+      "material": "Gore-Tex Pro",
+      "sellado": "Triple",
+      "látex": "Cuello y puños"
+    },
+    "dailyRate": 55,
+    "imageURL": "https://images.unsplash.com/photo-1731173064182-1104278d2fc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxkcnklMjBzdWl0JTIwa2F5YWslMjB3YXRlcnxlbnwwfDB8fHwxNzY2NDEwNzk1fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-038",
+    "name": "Remo Werner Cyprus",
+    "category": "deportes-acuaticos",
+    "description": "Remo de kayak touring de fibra de carbono",
+    "specs": {
+      "material": "Carbono",
+      "peso": "680g",
+      "palas": "Ajustables"
+    },
+    "dailyRate": 18,
+    "imageURL": "https://images.unsplash.com/photo-1738456367879-737e9cce7b6d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxrYXlhayUyMHBhZGRsZSUyMGNhcmJvbnxlbnwwfDB8fHwxNzY2NDEwNzk2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-039",
+    "name": "Chaleco Salvavidas Astral YTV",
+    "category": "deportes-acuaticos",
+    "description": "PFD de alto rendimiento para kayak y SUP",
+    "specs": {
+      "flotabilidad": "70N",
+      "peso": "450g",
+      "bolsillos": "2 frontales"
+    },
+    "dailyRate": 12,
+    "imageURL": "https://images.unsplash.com/photo-1599661415538-87846799c2d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxsaWZlJTIwamFja2V0JTIwa2F5YWslMjB3YXRlcnxlbnwwfDB8fHwxNzY2NDEwNzk3fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-040",
+    "name": "Wetsuit O'Neill Psycho Tech 5/4mm",
+    "category": "deportes-acuaticos",
+    "description": "Traje de neopreno premium para aguas frías",
+    "specs": {
+      "grosor": "5/4mm",
+      "material": "TechnoButter 3",
+      "costuras": "Selladas"
+    },
+    "dailyRate": 35,
+    "imageURL": "https://images.unsplash.com/photo-1754430544039-9da4dc746d2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx3ZXRzdWl0JTIwc3VyZmluZyUyMGRpdmluZ3xlbnwwfDB8fHwxNzY2NDEwNzk4fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-041",
+    "name": "Tabla Surf Firewire Dominator 2",
+    "category": "deportes-acuaticos",
+    "description": "Tabla híbrida para surf de alto rendimiento",
+    "specs": {
+      "construcción": "Linear Flex Technology",
+      "quillas": "Futures",
+      "volumen": "35.9L"
+    },
+    "dailyRate": 40,
+    "imageURL": "https://images.unsplash.com/photo-1765829059078-1698b3258b4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzdXJmYm9hcmQlMjB3YXZlJTIwc3BvcnR8ZW58MHwwfHx8MTc2NjQxMDc5OXww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-042",
+    "name": "Equipo Buceo Mares Quantum",
+    "category": "deportes-acuaticos",
+    "description": "Kit completo BCD + regulador para buceo",
+    "specs": {
+      "BCD": "Quantum",
+      "regulador": "Dual ADJ",
+      "profundidad": "50m"
+    },
+    "dailyRate": 75,
+    "imageURL": "https://images.unsplash.com/photo-1758656993377-e7be90b57557?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxzY3ViYSUyMGRpdmluZyUyMGVxdWlwbWVudHxlbnwwfDB8fHwxNzY2NDEwODAwfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-043",
+    "name": "Máscara Buceo Cressi Big Eyes Evolution",
+    "category": "deportes-acuaticos",
+    "description": "Máscara de buceo con visión panorámica",
+    "specs": {
+      "volumen": "Bajo",
+      "cristales": "Templado",
+      "silicona": "Premium"
+    },
+    "dailyRate": 10,
+    "imageURL": "https://images.unsplash.com/photo-1603738526300-c0fedf7f900a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxkaXZpbmclMjBtYXNrJTIwdW5kZXJ3YXRlcnxlbnwwfDB8fHwxNzY2NDEwODAyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-044",
+    "name": "Aletas Mares Avanti Quattro Power",
+    "category": "deportes-acuaticos",
+    "description": "Aletas de buceo de alto rendimiento",
+    "specs": {
+      "material": "Bimaterial",
+      "propulsión": "Canal",
+      "tallas": "Regular/XL"
+    },
+    "dailyRate": 12,
+    "imageURL": null
+  },
+  {
+    "id": "gear-045",
+    "name": "Ordenador Buceo Shearwater Peregrine",
+    "category": "deportes-acuaticos",
+    "description": "Computadora de buceo recreativo avanzada",
+    "specs": {
+      "pantalla": "AMOLED 2.2\"",
+      "algoritmo": "Buhlmann ZHL-16c",
+      "recargable": "Sí"
+    },
+    "dailyRate": 35,
+    "imageURL": null
+  },
+  {
+    "id": "gear-046",
+    "name": "Tabla Windsurf Starboard iQFoil",
+    "category": "deportes-acuaticos",
+    "description": "Tabla olímpica de foil windsurf",
+    "specs": {
+      "longitud": "95L",
+      "foil": "Carbono",
+      "uso": "Racing"
+    },
+    "dailyRate": 120,
+    "imageURL": "https://images.unsplash.com/photo-1615840956750-3262c5fffb62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx3aW5kc3VyZmluZyUyMGJvYXJkJTIwd2F0ZXJ8ZW58MHwwfHx8MTc2NjQxMDgwM3ww&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-047",
+    "name": "Vela Windsurf Severne Turbo GT",
+    "category": "deportes-acuaticos",
+    "description": "Vela freerace de alto rendimiento",
+    "specs": {
+      "tamaño": "7.8m²",
+      "cambers": "3",
+      "material": "Monofilm X-Ply"
+    },
+    "dailyRate": 45,
+    "imageURL": "https://images.unsplash.com/photo-1762112536207-341d5ec3fe1e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHx3aW5kc3VyZmluZyUyMHNhaWwlMjBzcG9ydHxlbnwwfDB8fHwxNzY2NDEwODA0fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-048",
+    "name": "Cometa Kitesurf Duotone Rebel",
+    "category": "deportes-acuaticos",
+    "description": "Cometa freeride-wave versátil",
+    "specs": {
+      "tamaño": "10m²",
+      "tipo": "C-Shape híbrida",
+      "barra": "Trust Bar"
+    },
+    "dailyRate": 65,
+    "imageURL": "https://images.unsplash.com/photo-1648816156352-19e6b3426806?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDU4NTd8MHwxfHNlYXJjaHwxfHxraXRlc3VyZmluZyUyMGtpdGUlMjBiZWFjaHxlbnwwfDB8fHwxNzY2NDEwODA1fDA&ixlib=rb-4.1.0&q=80&w=1080"
+  },
+  {
+    "id": "gear-049",
+    "name": "Tabla Kitesurf Core Fusion 5",
+    "category": "deportes-acuaticos",
+    "description": "Twin-tip freeride versátil",
+    "specs": {
+      "longitud": "140cm",
+      "construcción": "Carbono Wood",
+      "fijaciones": "Ajustables"
+    },
+    "dailyRate": 35,
+    "imageURL": null
+  },
+  {
+    "id": "gear-050",
+    "name": "Arnés Kite ION Apex Curv 13",
+    "category": "deportes-acuaticos",
+    "description": "Arnés de cintura premium para kitesurf",
+    "specs": {
+      "construcción": "Curv Tech",
+      "cierre": "Spectre Bar",
+      "peso": "1.2kg"
+    },
+    "dailyRate": 22,
+    "imageURL": null
   }
 ]

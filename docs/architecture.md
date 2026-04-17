@@ -1,298 +1,278 @@
-# Architecture — Rent my Gear
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Tech Stack](#tech-stack)
-3. [Directory Structure](#directory-structure)
-4. [Layered Architecture](#layered-architecture)
-5. [Request Lifecycle](#request-lifecycle)
-6. [Data Model](#data-model)
-7. [Validation Strategy](#validation-strategy)
-8. [Caching](#caching)
-9. [Error Boundaries](#error-boundaries)
-10. [Environment Configuration](#environment-configuration)
-
----
+# Architecture Documentation
 
 ## Overview
 
-Rent my Gear is a Next.js 16+ App Router application. It has no database — inventory lives in `src/data/inventory.json`, loaded at runtime and cached in memory. Missing product images are generated on demand via the Gemini API (branded internally as "Nano Banana"). Google Cloud Storage is an optional upgrade path for persisting generated images.
+Rent my Gear is a Next.js 16+ application using the App Router pattern. The application follows a layered architecture with clear separation between presentation, business logic, and data access layers.
 
-The UI is in Spanish. All code, identifiers, and comments are in English.
+## Technology Stack
 
----
-
-## Tech Stack
-
-| Concern | Library | Version |
-|---------|---------|---------|
-| Framework | Next.js (App Router) | 16.2.4 |
-| Language | TypeScript (strict) | 6.0.3 |
-| UI | React | 19.2.5 |
-| Styling | Tailwind CSS v4 | 4.2.2 |
-| Components | shadcn/ui + Radix UI | — |
-| Validation | Zod | 4.3.6 |
-| Dates | date-fns | 4.1.0 |
-| Icons | Lucide React | — |
-| AI Images | Gemini 2.0 Flash (image generation) | — |
-| Storage | Google Cloud Storage | — |
-| Testing | Vitest + React Testing Library | 4.1.4 / 16.3.2 |
-
----
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| Framework | Next.js 16+ | Full-stack React framework with App Router |
+| UI Library | React 19 | Component-based UI |
+| Styling | Tailwind CSS + shadcn/ui | Utility-first CSS with pre-built components |
+| Validation | Zod | Runtime type validation and schema definition |
+| AI | Google Generative AI | Image generation (Nano Banana) |
+| Storage | Google Cloud Storage | Persistent image storage |
+| Date Handling | date-fns | Date manipulation and formatting |
 
 ## Directory Structure
 
 ```
-/
+rent-my-gear/
 ├── src/
-│   ├── app/                        # Next.js App Router
-│   │   ├── layout.tsx              # Root HTML, sticky nav, Toaster
-│   │   ├── page.tsx                # Home: HeroCarousel + CategoryButtons
-│   │   ├── error.tsx               # Global error boundary
-│   │   ├── loading.tsx             # Global loading skeleton
-│   │   ├── not-found.tsx           # 404 page
-│   │   ├── globals.css             # Tailwind imports + CSS variables
-│   │   ├── category/[id]/          # Category inventory grid
-│   │   │   ├── page.tsx            # Statically generated per category
-│   │   │   ├── loading.tsx
-│   │   │   └── error.tsx
-│   │   ├── gear/[id]/              # Gear detail + RentalFlow wizard
+│   ├── app/                      # Next.js App Router
+│   │   ├── layout.tsx            # Root layout
+│   │   ├── page.tsx              # Home page
+│   │   ├── error.tsx             # Global error boundary
+│   │   ├── category/[id]/        # Dynamic category pages
 │   │   │   ├── page.tsx
 │   │   │   ├── loading.tsx
 │   │   │   └── error.tsx
-│   │   └── api/
-│   │       ├── generate-image/route.ts   # GET|POST image resolution
-│   │       └── rental/route.ts           # POST create rental
+│   │   ├── gear/[id]/            # Dynamic gear detail pages
+│   │   │   ├── page.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── error.tsx
+│   │   └── api/                  # API routes
+│   │       ├── rental/route.ts
+│   │       └── generate-image/route.ts
 │   │
 │   ├── components/
-│   │   ├── ui/                     # shadcn/ui primitives
-│   │   │   ├── badge.tsx
+│   │   ├── ui/                   # shadcn/ui components
 │   │   │   ├── button.tsx
-│   │   │   ├── calendar.tsx        # DayPicker wrapper (Spanish locale)
 │   │   │   ├── card.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── separator.tsx
-│   │   │   ├── toast.tsx
-│   │   │   └── toaster.tsx
-│   │   └── features/
+│   │   │   ├── calendar.tsx
+│   │   │   ├── carousel.tsx
+│   │   │   └── ...
+│   │   └── features/             # Feature-specific components
+│   │       ├── HeroCarousel.tsx
 │   │       ├── CategoryButtons.tsx
-│   │       ├── GearGrid.tsx        # Searchable inventory grid
-│   │       ├── GearImage.tsx       # Smart image with Nano Banana fallback
-│   │       ├── HeroCarousel.tsx    # Auto-rotating featured items
-│   │       └── RentalFlow/         # 4-step rental wizard
-│   │           ├── index.tsx       # Wizard shell + step indicator
-│   │           ├── StepSelection.tsx
-│   │           ├── StepConfiguration.tsx
-│   │           ├── StepSummary.tsx
-│   │           └── StepConfirmation.tsx
+│   │       ├── GearGrid.tsx
+│   │       ├── GearImage.tsx
+│   │       └── RentalFlow/
+│   │           ├── index.tsx
+│   │           ├── DateSelection.tsx
+│   │           ├── PriceSummary.tsx
+│   │           └── Confirmation.tsx
 │   │
-│   ├── services/
-│   │   ├── inventoryService.ts     # Gear CRUD + Fisher-Yates shuffle
-│   │   ├── imageService.ts         # Gemini image generation + persistence
-│   │   └── storageService.ts       # GCS upload/delete wrapper
+│   ├── services/                 # Business logic layer
+│   │   ├── inventoryService.ts   # Inventory CRUD operations
+│   │   ├── imageService.ts       # Image resolution and generation
+│   │   └── storageService.ts     # GCS operations
 │   │
-│   ├── lib/
-│   │   ├── validation.ts           # All Zod schemas and inferred types
-│   │   ├── date-utils.ts           # Price calculation, date helpers
-│   │   └── utils.ts                # cn() — clsx + tailwind-merge
+│   ├── lib/                      # Utilities
+│   │   ├── validation.ts         # Zod schemas
+│   │   ├── date-utils.ts         # Date utilities
+│   │   └── utils.ts              # General utilities
 │   │
 │   ├── config/
-│   │   └── env.ts                  # Lazy Zod env validation + singleton
-│   │
-│   ├── hooks/
-│   │   └── use-toast.ts            # Toast state via listener pattern
+│   │   └── env.ts                # Environment validation
 │   │
 │   ├── data/
-│   │   └── inventory.json          # 50 items — source of truth
+│   │   └── inventory.json        # Mock inventory data
 │   │
 │   └── test/
-│       └── setup.tsx               # Vitest globals + Next.js mocks
+│       └── setup.tsx             # Test configuration
 │
-├── scripts/
-│   ├── setup_gcs.py                # GCS bucket creation + smoke test
-│   └── generate_inventory.py       # Populate imageURLs from Unsplash
+├── scripts/                      # Python utilities
+│   ├── generate_inventory.py     # Inventory generation script
+│   ├── setup_gcs.py              # GCS setup script
+│   └── pyproject.toml            # Python dependencies
 │
-├── docs/                           # Technical documentation
-└── .env.local                      # Secrets (git-ignored)
+├── docs/                         # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── TESTING.md
+│   └── ONBOARDING.md
+│
+└── public/                       # Static assets
 ```
 
----
+## Component Architecture
 
-## Layered Architecture
+### Page Components (Server Components)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Presentation Layer                    │
-│   src/app/ pages    src/components/features/            │
-│   (Server Components + "use client" islands)            │
-└──────────────────────────┬──────────────────────────────┘
-                           │  calls
-┌──────────────────────────▼──────────────────────────────┐
-│                  Business Logic Layer                   │
-│   src/services/   (inventoryService, imageService)      │
-│   src/lib/        (date-utils, validation)              │
-└──────────────────────────┬──────────────────────────────┘
-                           │  reads/writes
-┌──────────────────────────▼──────────────────────────────┐
-│                     Data Layer                          │
-│   src/data/inventory.json   (in-memory cache, 5-min TTL)│
-│   Google Cloud Storage      (optional image persistence)│
-│   Gemini API                (on-demand image generation)│
+│                    RootLayout                            │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                   Header                           │  │
+│  └───────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                   Content                          │  │
+│  │  ┌─────────────────────────────────────────────┐  │  │
+│  │  │  HomePage / CategoryPage / GearDetailPage   │  │  │
+│  │  └─────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                   Footer                           │  │
+│  └───────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Key rule
-
-Pages and components **never** touch `inventory.json` directly. They always go through the service layer. The only exception is `imageService.ts`, which writes back generated image URLs to `inventory.json` for permanent persistence.
-
----
-
-## Request Lifecycle
-
-### Page render (Server Component)
+### Feature Components (Client Components)
 
 ```
-Browser GET /category/fotografia-video
-  → Next.js App Router matches src/app/category/[id]/page.tsx
-  → page.tsx calls getGearByCategory("fotografia-video")
-  → inventoryService loads/caches inventory.json
-  → Returns GearItem[] — validated against gearItemSchema
-  → React renders GearGrid as a Server Component
-  → HTML streamed to browser
-  → "use client" components (GearGrid search, GearImage) hydrate
+HeroCarousel ─────► CarouselItem ─────► GearCard
+     │
+     └── Uses: Carousel (shadcn), Image (next/image)
+
+CategoryButtons ──► CategoryButton ───► Link (next/link)
+
+GearGrid ─────────► GearCard ──────────► Image, Badge, Card
+
+RentalFlow ───────► DateSelection ────► Calendar (shadcn)
+     │              PriceSummary ─────► Card, Button
+     │              Confirmation ─────► Card
+     │
+     └── State: step, dates, confirmationId
 ```
 
-### Image generation (Client → API → Gemini)
+## Data Flow
+
+### Request Flow
 
 ```
-GearImage mounts with src=null
-  → useEffect fires: GET /api/generate-image?gearId=da-011
-  → API route calls resolveImageUrl("da-011", "Garmin Descent Mk3i")
-  → imageService finds item in inventory — imageURL is null
-  → POST to Gemini API with product photography prompt
-  → Gemini returns base64-encoded image
-  → imageService returns data:image/webp;base64,...
-  → API responds with { imageURL }
-  → GearImage sets state → renders <img src={dataUrl} />
+Client Request
+     │
+     ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Next.js   │───►│   Service   │───►│    Data     │
+│   Router    │    │   Layer     │    │   Layer     │
+└─────────────┘    └─────────────┘    └─────────────┘
+     │                   │                   │
+     │                   │                   │
+     ▼                   ▼                   ▼
+  App Router       inventoryService     inventory.json
+  API Routes       imageService         GCS Bucket
+                   storageService       Gemini AI
 ```
 
-### Rental confirmation
+### State Management
 
-```
-User fills wizard → clicks "Confirmar Renta"
-  → StepConfirmation POST /api/rental
-  → API validates body with rentalRequestRefinedSchema
-  → Checks gear exists and is available
-  → Generates rentalId: RMG-<UUID[:8].toUpperCase()>
-  → Returns { rentalId, message, gear, startDate, endDate }
-  → StepConfirmation shows success state + fires toast
-```
+The application uses React's built-in state management:
 
----
+- **Server State**: Fetched in Server Components, passed as props
+- **Client State**: useState/useEffect in Client Components
+- **URL State**: Dynamic route parameters ([id])
 
-## Data Model
+## API Routes
 
-### `GearItem` (from `src/lib/validation.ts`)
+### POST /api/rental
 
+Creates a new rental reservation.
+
+**Request:**
 ```typescript
 {
-  id:          string          // "fv-001", "mc-018", "da-011"
-  name:        string          // Human-readable name (Spanish OK)
-  category:    Category        // "fotografia-video" | "montana-camping" | "deportes-acuaticos"
-  description: string
-  dailyRate:   number          // MXN, positive
-  imageURL:    string | null | undefined   // Unsplash URL, data URL, or null
-  specs:       Record<string, string>      // Key-value pairs for detail page
-  available:   boolean
+  gearId: string;
+  startDate: string; // ISO 8601
+  endDate: string;   // ISO 8601
 }
 ```
 
-### `RentalRequest`
-
+**Response:**
 ```typescript
 {
-  gearId:        string    // Must match an existing GearItem
-  startDate:     string    // ISO 8601, must be >= today
-  endDate:       string    // ISO 8601, must be > startDate
-  customerName:  string    // Min 2 characters
-  customerEmail: string    // Valid email format
+  id: string;
+  gearId: string;
+  gearName: string;
+  startDate: string;
+  endDate: string;
+  totalDays: number;
+  dailyRate: number;
+  totalPrice: number;
+  status: "confirmed";
+  createdAt: string;
 }
 ```
 
-### ID Conventions
+### POST /api/generate-image
 
-| Prefix | Category |
-|--------|----------|
-| `fv-` | fotografia-video |
-| `mc-` | montana-camping |
-| `da-` | deportes-acuaticos |
+Generates an image using Nano Banana AI.
 
-Items `da-011–da-015`, `mc-018–mc-019`, `fv-018` have `imageURL: null` — these trigger Nano Banana generation.
-
----
-
-## Validation Strategy
-
-Zod is the single validation layer. The same schema validates API bodies, inventory data, and provides TypeScript types via `z.infer<>`.
-
-```
-API boundary        → safeParse() with structured errors returned as JSON
-Inventory load      → parse() — throws on startup if data is corrupt
-Environment vars    → parse() inside getEnv() — throws with descriptive message
-Frontend forms      → manual regex + length checks in StepSummary (not Zod)
+**Request:**
+```typescript
+{
+  gearId: string;
+}
 ```
 
-All API error responses use the first `result.error.issues[0].message` so the client always receives a single human-readable message.
-
----
-
-## Caching
-
-| Resource | Strategy | TTL |
-|----------|----------|-----|
-| Inventory data | Module-level `_cache` array | 5 minutes |
-| Environment vars | Module-level `_env` singleton | Process lifetime |
-| Generated images | Written to `inventory.json` | Permanent |
-| GCS images | Public bucket URL | Permanent |
-
-The 5-minute inventory cache means a newly generated image URL written to `inventory.json` won't be seen by `inventoryService` until the next cache expiry. This is acceptable because `imageService` reads `inventory.json` directly (bypassing the cache) to check for existing URLs.
-
----
-
-## Error Boundaries
-
-Three nested boundaries, each with a retry button:
-
-```
-src/app/error.tsx                    ← catches everything
-  src/app/category/[id]/error.tsx    ← catches category page errors
-    src/app/gear/[id]/error.tsx      ← catches gear detail errors
+**Response:**
+```typescript
+{
+  gearId: string;
+  imageURL: string;
+  generated: boolean;
+  message: string;
+}
 ```
 
-Client-side errors within `StepConfirmation` are caught with try/catch and surfaced via the toast system — they do not bubble to the error boundary.
+## Error Handling
 
----
+### Error Boundaries
 
-## Environment Configuration
+Each route group has its own error boundary:
 
-`src/config/env.ts` uses a lazy singleton:
+```
+src/app/
+├── error.tsx              # Global error boundary
+├── category/[id]/
+│   └── error.tsx          # Category-specific errors
+└── gear/[id]/
+    └── error.tsx          # Gear detail errors
+```
+
+### Error Recovery
 
 ```typescript
-let _env: z.infer<typeof envSchema> | null = null;
-
-export function getEnv() {
-  if (!_env) {
-    const result = envSchema.safeParse(process.env);
-    if (!result.success) throw new Error(...);
-    _env = result.data;
-  }
-  return _env;
+// error.tsx pattern
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  return (
+    <div>
+      <h2>Something went wrong</h2>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
 }
 ```
 
-This means:
-- No crash at build time if env vars are absent (useful for CI without secrets)
-- Crash happens at the first **runtime** call that needs the variable
-- GCS vars are `optional()` — `storageService` guards them with `requireGcsEnv()`
-- `NANO_BANANA_API_KEY` is required at runtime for any image generation
+## Caching Strategy
+
+### Inventory Cache
+
+```typescript
+// inventoryService.ts
+let inventoryCache: GearItem[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+```
+
+### Image Optimization
+
+Next.js Image component handles:
+- Lazy loading
+- Responsive sizing
+- Format optimization (WebP)
+- Caching via CDN
+
+## Security Considerations
+
+1. **Environment Variables**: Sensitive keys stored in `.env.local` (gitignored)
+2. **Input Validation**: All inputs validated with Zod schemas
+3. **API Security**: Server-side validation before processing
+4. **XSS Prevention**: React's automatic escaping
+5. **CORS**: Handled by Next.js API routes
+
+## Performance Optimizations
+
+1. **Server Components**: Default for static content
+2. **Streaming**: Suspense boundaries for progressive loading
+3. **Image Optimization**: next/image with responsive sizes
+4. **Code Splitting**: Automatic per-route splitting
+5. **Caching**: Inventory cache with TTL
